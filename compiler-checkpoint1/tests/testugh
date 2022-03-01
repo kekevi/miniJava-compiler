@@ -1,3 +1,5 @@
 class id {
-    int x;
+    void method() {
+        return;
+    }
 }
