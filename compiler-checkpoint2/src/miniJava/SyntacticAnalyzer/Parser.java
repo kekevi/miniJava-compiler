@@ -201,23 +201,12 @@ public class Parser {
   private ParameterDeclList parseParamList() throws SyntaxError {
     ParameterDeclList params = new ParameterDeclList();
 
-    // could just be a do while loop
     do {
       int param_start = startpos;
       TypeDenoter type = parseType();
       String name = accept(TokenKind.ID).spelling;
       params.add(new ParameterDecl(type, name, new SourcePosition(param_start, finishpos)));
     } while (acceptCheck(TokenKind.COMMA));
-
-    // TypeDenoter first_type =  parseType();
-    // String first_name = accept(TokenKind.ID).spelling;
-    // params.add(new ParameterDecl(first_type, first_name, nullpos));
-
-    // while (acceptCheck(TokenKind.COMMA)) {
-    //   TypeDenoter other_type = parseType();
-    //   String other_name = accept(TokenKind.ID).spelling;
-    //   params.add(new ParameterDecl(other_type, other_name, nullpos));
-    // }
 
     return params;
   }
@@ -228,10 +217,6 @@ public class Parser {
     do {
       expressions.add(parseExpression());
     } while (acceptCheck(TokenKind.COMMA));
-    // expressions.add(parseExpression());
-    // while (acceptCheck(TokenKind.COMMA)) {
-    //   expressions.add(parseExpression());
-    // }
     return expressions;
   }
 
