@@ -42,6 +42,8 @@ public class Token {
         return TokenKind.TRUE;
       case "false":
         return TokenKind.FALSE;
+      case "null":
+        return TokenKind.NULL;
 
       // keywords - visibility
       case "public":

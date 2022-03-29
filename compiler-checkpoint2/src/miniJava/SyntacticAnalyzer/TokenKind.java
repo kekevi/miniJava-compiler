@@ -56,6 +56,7 @@ public enum TokenKind {
   STATIC,         // access
   TRUE,
   FALSE,
+  NULL,
   
   // keywords - visibility
   PUBLIC,

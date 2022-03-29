@@ -496,6 +496,10 @@ public class Parser {
         case FALSE:
           return new LiteralExpr(new BooleanLiteral(acceptIt()), new SourcePosition(expr_start, finishpos));
 
+        //    NullLiteral
+        case NULL:
+          return new LiteralExpr(new NullLiteral(acceptIt()), new SourcePosition(expr_start, finishpos));
+
         // NewExpr
         case NEW:
           acceptIt();
