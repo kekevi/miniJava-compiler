@@ -13,6 +13,11 @@ public class MethodDeclList implements Iterable<MethodDecl>
 		methodDeclList = new ArrayList<MethodDecl>();
 	}   
 
+	public MethodDeclList(MethodDecl method1) {
+		this();
+		methodDeclList.add(method1);
+	}
+
 	public void add(MethodDecl cd){
 		methodDeclList.add(cd);
 	}

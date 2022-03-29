@@ -13,6 +13,11 @@ public class FieldDeclList implements Iterable<FieldDecl>
 		fieldDeclList = new ArrayList<FieldDecl>();
 	}   
 
+	public FieldDeclList(FieldDecl field1) {
+		this();
+		fieldDeclList.add(field1);
+	}
+
 	public void add(FieldDecl cd){
 		fieldDeclList.add(cd);
 	}

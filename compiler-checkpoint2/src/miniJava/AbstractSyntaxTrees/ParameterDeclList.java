@@ -10,7 +10,12 @@ import java.util.*;
 public class ParameterDeclList implements Iterable<ParameterDecl>
 {
     public ParameterDeclList() {
-    	parameterDeclList = new ArrayList<ParameterDecl>();
+        parameterDeclList = new ArrayList<ParameterDecl>();
+    }
+    
+    public ParameterDeclList(ParameterDecl param1) {
+        this();
+        parameterDeclList.add(param1);
     }
     
     public void add(ParameterDecl s){

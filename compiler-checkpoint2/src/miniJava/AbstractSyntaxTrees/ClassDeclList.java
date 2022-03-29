@@ -13,6 +13,11 @@ public class ClassDeclList implements Iterable<ClassDecl>
 		classDeclList = new ArrayList<ClassDecl>();
 	}   
 
+	public ClassDeclList(ClassDecl clas1) {
+		this();
+		classDeclList.add(clas1);
+	}
+
 	public void add(ClassDecl cd){
 		classDeclList.add(cd);
 	}
