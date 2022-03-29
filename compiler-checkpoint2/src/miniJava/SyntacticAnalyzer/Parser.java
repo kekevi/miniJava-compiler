@@ -11,10 +11,10 @@ public class Parser {
 
   private Scanner scanner;
   private ErrorReporter reporter;
-  private Token token;
+  private Token token; // current token to parse
+  private int startpos; // current token.posn (automatically updated by accepting functions)
+  private int finishpos; // last token parsed
   private boolean trace = true;
-  // TODO: replace all nullpos with actual source positions
-  private static final SourcePosition nullpos = null;
   
   public Parser(Scanner scanner, ErrorReporter reporter, boolean debugMode) {
     this.scanner = scanner;
@@ -39,8 +39,11 @@ public class Parser {
    */
   public Package parse() {
     token = scanner.scan();
+    int pkg_start = startpos;
     try {
-      return new Package(parseProgram(), nullpos);
+      // should be okay since parseProgram will run first, then finishpos will already be updated --> apparently this is not guaranteed in C
+      // also this is what decorators are for! for *extending* functions with extra functionality!
+      return new Package(parseProgram(), new SourcePosition(pkg_start, finishpos)); 
     }
     catch (SyntaxError e) {
       return null;
@@ -58,6 +61,7 @@ public class Parser {
   }
 
   private ClassDecl parseClassDeclaration() throws SyntaxError {
+    int class_start = startpos;
     accept(TokenKind.CLASS);
     String classname = accept(TokenKind.ID).spelling;
     accept(TokenKind.LCURLY);
@@ -76,7 +80,7 @@ public class Parser {
     }
 
     accept(TokenKind.RCURLY);
-    return new ClassDecl(classname, fields, methods, nullpos);
+    return new ClassDecl(classname, fields, methods, new SourcePosition(class_start, finishpos));
   }
 
   /** Auxiliary struct to return a MemberDecl along with the specific type */
@@ -90,11 +94,13 @@ public class Parser {
   }
 
   private MemberSpecifier parseClassItem() throws SyntaxError {
+    int classitem_start = startpos;
     boolean isPrivate = parseVisibility();
     boolean isStatic = parseAccess();
 
     // void MethodDecl
     if (acceptCheck(TokenKind.VOID)) {
+      int void_pos = finishpos;
       String methodname = accept(TokenKind.ID).spelling;
       accept(TokenKind.LPAREN);
 
@@ -104,14 +110,12 @@ public class Parser {
       }
       accept(TokenKind.RPAREN);
       accept(TokenKind.LCURLY);
-      // TODO: figure out how to check if Statement exists: // can I do (token.kind != RCURLY), then hope parseStatement() will eventually throw an error?
-      // while ("starterSet of Statement that hopefully is disjoint with RCURLY") {
       StatementList statements = new StatementList();
       while (token.kind != TokenKind.RCURLY) {
         statements.add(parseStatement());
       }
       accept(TokenKind.RCURLY);
-      return new MemberSpecifier(new MethodDecl(new FieldDecl(isPrivate, isStatic, new BaseType(TypeKind.VOID, nullpos), methodname, nullpos), params, statements, nullpos), false);
+      return new MemberSpecifier(new MethodDecl(new FieldDecl(isPrivate, isStatic, new BaseType(TypeKind.VOID, new SourcePosition(void_pos)), methodname, new SourcePosition(classitem_start, finishpos)), params, statements, new SourcePosition(classitem_start, finishpos)), false);
     }
 
     TypeDenoter type = parseType();
@@ -120,7 +124,7 @@ public class Parser {
     // (typed) FieldDecl
     if (token.kind == TokenKind.SEMICOLON) {
       acceptIt();
-      return new MemberSpecifier(new FieldDecl(isPrivate, isStatic, type, name, nullpos), true);
+      return new MemberSpecifier(new FieldDecl(isPrivate, isStatic, type, name, new SourcePosition(classitem_start, finishpos)), true);
     }
 
     // typed MethodDecl
@@ -131,14 +135,12 @@ public class Parser {
     }
     accept(TokenKind.RPAREN);
     accept(TokenKind.LCURLY);
-    // TODO: figure out how to check if Statement exists:
-    // while ("starterSet of Statment that hopefully is disjoint with RCURLY") {
     StatementList statements = new StatementList();
     while (token.kind != TokenKind.RCURLY) {
       statements.add(parseStatement());
     }
     accept(TokenKind.RCURLY);
-    return new MemberSpecifier(new MethodDecl(new FieldDecl(isPrivate, isStatic, type, name, nullpos), params, statements, nullpos), false);
+    return new MemberSpecifier(new MethodDecl(new FieldDecl(isPrivate, isStatic, type, name, new SourcePosition(classitem_start, finishpos)), params, statements, new SourcePosition(classitem_start, finishpos)), false);
   }
 
   /**
@@ -173,18 +175,19 @@ public class Parser {
 
   // REVIEW: (1) if you change `parseType` or `parseReference`, you should change `parseStatement`
   private TypeDenoter parseType(Token prev) throws SyntaxError {
+    SourcePosition type_pos = new SourcePosition(startpos);
     switch (prev.kind) {
       case BOOLEAN:
-        return new BaseType(TypeKind.BOOLEAN, nullpos);
+        return new BaseType(TypeKind.BOOLEAN, type_pos);
       case INT:
       case ID:
         boolean isInt = prev.kind == TokenKind.INT;
         if (token.kind == TokenKind.LSQUARE) {
           accept(TokenKind.LSQUARE);
           accept(TokenKind.RSQUARE);
-          return new ArrayType(isInt ? new BaseType(TypeKind.INT, nullpos) : new ClassType(new Identifier(prev), nullpos), nullpos);
+          return new ArrayType(isInt ? new BaseType(TypeKind.INT, type_pos) : new ClassType(new Identifier(prev), type_pos), type_pos);
         }
-        return isInt ? new BaseType(TypeKind.INT, nullpos) : new ClassType(new Identifier(prev), nullpos);
+        return isInt ? new BaseType(TypeKind.INT, type_pos) : new ClassType(new Identifier(prev), type_pos);
       default:
         parseError("Invalid Type: Expecting int, boolean, identifier, or (int|id)[], but found: " + prev.kind);
         return null;
@@ -198,15 +201,23 @@ public class Parser {
   private ParameterDeclList parseParamList() throws SyntaxError {
     ParameterDeclList params = new ParameterDeclList();
 
-    TypeDenoter first_type =  parseType();
-    String first_name = accept(TokenKind.ID).spelling;
-    params.add(new ParameterDecl(first_type, first_name, nullpos));
+    // could just be a do while loop
+    do {
+      int param_start = startpos;
+      TypeDenoter type = parseType();
+      String name = accept(TokenKind.ID).spelling;
+      params.add(new ParameterDecl(type, name, new SourcePosition(param_start, finishpos)));
+    } while (acceptCheck(TokenKind.COMMA));
 
-    while (acceptCheck(TokenKind.COMMA)) {
-      TypeDenoter other_type = parseType();
-      String other_name = accept(TokenKind.ID).spelling;
-      params.add(new ParameterDecl(other_type, other_name, nullpos));
-    }
+    // TypeDenoter first_type =  parseType();
+    // String first_name = accept(TokenKind.ID).spelling;
+    // params.add(new ParameterDecl(first_type, first_name, nullpos));
+
+    // while (acceptCheck(TokenKind.COMMA)) {
+    //   TypeDenoter other_type = parseType();
+    //   String other_name = accept(TokenKind.ID).spelling;
+    //   params.add(new ParameterDecl(other_type, other_name, nullpos));
+    // }
 
     return params;
   }
@@ -214,32 +225,36 @@ public class Parser {
   private ExprList parseArgList() throws SyntaxError {
     ExprList expressions = new ExprList();
 
-    expressions.add(parseExpression());
-    while (acceptCheck(TokenKind.COMMA)) {
+    do {
       expressions.add(parseExpression());
-    }
+    } while (acceptCheck(TokenKind.COMMA));
+    // expressions.add(parseExpression());
+    // while (acceptCheck(TokenKind.COMMA)) {
+    //   expressions.add(parseExpression());
+    // }
     return expressions;
   }
 
   // REVIEW: (1) if you change `parseType` or `parseReference`, you should change `parseStatement`
   private Reference parseReference(Reference innerRef) throws SyntaxError {
+    SourcePosition ref_pos = new SourcePosition(startpos);
     Reference left;
     // if (! (acceptCheck(TokenKind.THIS) || acceptCheck(TokenKind.ID))) { error! }
     if (token.kind == TokenKind.THIS && innerRef == null) {
       acceptIt();
-      left = new ThisRef(nullpos);
+      left = new ThisRef(ref_pos);
     } else if (token.kind == TokenKind.THIS && innerRef != null) {
       parseError("Invalid Reference: `this` cannot be an attribute of another Reference. (inside parseReference)");    
       return null;
     } else if (innerRef != null && token.kind != TokenKind.THIS) {
-      left = new QualRef(innerRef, new Identifier(accept(TokenKind.ID)), nullpos);
+      left = new QualRef(innerRef, new Identifier(accept(TokenKind.ID)), ref_pos);
     } else { // innnerRef == null && token.kind != THIS
-      left = new IdRef(new Identifier(accept(TokenKind.ID)), nullpos);
+      left = new IdRef(new Identifier(accept(TokenKind.ID)), ref_pos);
     }
 
     Reference right;
     while (acceptCheck(TokenKind.PERIOD)) {
-      right = new QualRef(left, new Identifier(accept(TokenKind.ID)), nullpos); // righter/specific-er ref is higher on AST
+      right = new QualRef(left, new Identifier(accept(TokenKind.ID)), new SourcePosition(finishpos)); // righter/specific-er ref is higher on AST
       left = right;
     }
 
@@ -251,6 +266,7 @@ public class Parser {
   }
 
   private Statement parseStatement() throws SyntaxError {
+    int statement_start = startpos;
     // checks RETURN, IF, WHILE, and LCURLY cases
     switch (token.kind) {
       // ReturnStmt
@@ -261,7 +277,7 @@ public class Parser {
           toReturn = parseExpression();
           accept(TokenKind.SEMICOLON);
         }
-        return new ReturnStmt(toReturn, nullpos);
+        return new ReturnStmt(toReturn, new SourcePosition(statement_start, finishpos));
 
       // IfStmt
       case IF:
@@ -274,7 +290,7 @@ public class Parser {
         if (acceptCheck(TokenKind.ELSE)) {
           elseBlock = parseStatement();
         }
-        return new IfStmt(ifCondition, ifBlock, elseBlock, nullpos);
+        return new IfStmt(ifCondition, ifBlock, elseBlock, new SourcePosition(statement_start, finishpos));
 
       // WhileStmt
       case WHILE:
@@ -283,7 +299,7 @@ public class Parser {
         Expression whileCondition = parseExpression();
         accept(TokenKind.RPAREN);
         Statement whileBlock = parseStatement();
-        return new WhileStmt(whileCondition, whileBlock, nullpos);
+        return new WhileStmt(whileCondition, whileBlock, new SourcePosition(statement_start, finishpos));
 
       // BlockStmt
       case LCURLY:
@@ -293,11 +309,11 @@ public class Parser {
           statements.add(parseStatement());
         }
         accept(TokenKind.RCURLY);
-        return new BlockStmt(statements, nullpos);
+        return new BlockStmt(statements, new SourcePosition(statement_start, finishpos));
 
       case THIS:
         Reference left = parseReference();
-        Statement refStatement = parseStatement_Reference(left);
+        Statement refStatement = parseStatement_Reference(left, statement_start);
         return refStatement;
     }
 
@@ -305,6 +321,7 @@ public class Parser {
     // we parse an additional char before determining Type- or Reference- Statements
     // REVIEW: (1) if you change `parseType` or `parseReference`, you should change this
     if (token.kind == TokenKind.ID) {
+      int tbd_start = startpos;
       Token firstId = acceptIt();
       // Reference starting statement will only have PERIOD or ASSIGN after first id
       if (acceptCheck(TokenKind.PERIOD)) { // Reference with an attribute
@@ -312,66 +329,68 @@ public class Parser {
           // check added to parseReference(), but kept anyways
           parseError("Invalid Reference (in parseStatement): `this` cannot be an attribute of another reference.");
         }
-        Reference fullRef = parseReference(new IdRef(new Identifier(firstId), nullpos)); // guaranteed as current token chain is ID.ID(.ID)* 
-        return parseStatement_Reference(fullRef);
+        Reference fullRef = parseReference(new IdRef(new Identifier(firstId), new SourcePosition(tbd_start, finishpos))); // guaranteed as current token chain is ID.ID(.ID)* 
+        return parseStatement_Reference(fullRef, statement_start);
       } else if (token.kind == TokenKind.ID) { // two consecutive IDs must be a Statement->Type
         // if (acceptCheck(TokenKind.LSQUARE)) {
         //   accept(TokenKind.RSQUARE);
         // }
-        return parseStatement_Type(firstId); 
+        return parseStatement_Type(firstId, statement_start); 
       } else if (acceptCheck(TokenKind.LSQUARE)) { // by LSQUARE, it is still ambiguous whether it is a Type or Reference
         // NOTE: LL(3) Exception!!, it is much easier to parse Type and Reference on spot!
         if (acceptCheck(TokenKind.RSQUARE)) { 
           // must be Type ~ id [ ] varname = ... special case
-          TypeDenoter type = new ArrayType(new ClassType(new Identifier(firstId), nullpos), nullpos);
-          return parseStatement_Type(type);
+          TypeDenoter type = new ArrayType(new ClassType(new Identifier(firstId), new SourcePosition(finishpos)), new SourcePosition(tbd_start, finishpos));
+          return parseStatement_Type(type, statement_start);
         }  
         // must be Reference ~ id [ Expr ] = ... special case
-        Reference reference = new IdRef(new Identifier(firstId), nullpos);
-        return parseStatement_Reference_LSQUARE(reference);
+        Reference reference = new IdRef(new Identifier(firstId), new SourcePosition(tbd_start, finishpos));
+        return parseStatement_Reference_LSQUARE(reference, statement_start);
 
       } else { // must be Reference --> (ASSIGN | LPAREN)
-        return parseStatement_Reference(new IdRef(new Identifier(firstId), nullpos));
+        return parseStatement_Reference(new IdRef(new Identifier(firstId), new SourcePosition(tbd_start, finishpos)), statement_start);
       }
     }
 
     if (StarterSets.TypeStarters.contains(token.kind)) {
       TypeDenoter type = parseType();
-      return parseStatement_Type(type);
+      return parseStatement_Type(type, statement_start);
     }
 
     if(StarterSets.ReferenceStarters.contains(token.kind)) {
       Reference reference = parseReference();
-      return parseStatement_Reference(reference);
+      return parseStatement_Reference(reference, statement_start);
     }
 
     parseError("Invalid Statement - expected valid command but instead got: " + token.kind);
     return null;
   }
   
-  private Statement parseStatement_Type(TypeDenoter type) throws SyntaxError {
-    String name = accept(TokenKind.ID).spelling; // second id (varname)
+  private Statement parseStatement_Type(TypeDenoter type, int statement_start) throws SyntaxError {
+    Token name_token = accept(TokenKind.ID); // second id (varname)
+    String name = name_token.spelling;
+    int name_pos = name_token.posn.start;
     accept(TokenKind.ASSIGN);
     Expression value = parseExpression();
     accept(TokenKind.SEMICOLON);
-    return new VarDeclStmt(new VarDecl(type, name, nullpos), value, nullpos);
+    return new VarDeclStmt(new VarDecl(type, name, new SourcePosition(name_pos)), value, new SourcePosition(statement_start, finishpos));
   }
   
-  private Statement parseStatement_Type(Token typeToken) throws SyntaxError {
+  private Statement parseStatement_Type(Token typeToken, int statement_start) throws SyntaxError {
     TypeDenoter type = parseType(typeToken);
-    return parseStatement_Type(type);
+    return parseStatement_Type(type, statement_start);
   }
 
-  private Statement parseStatement_Reference(Reference left) throws SyntaxError {
+  private Statement parseStatement_Reference(Reference left, int statement_start) throws SyntaxError {
     switch (token.kind) {
       case ASSIGN:
         acceptIt();
         Expression value = parseExpression();
         accept(TokenKind.SEMICOLON);
-        return new AssignStmt(left, value, nullpos);
+        return new AssignStmt(left, value, new SourcePosition(statement_start, finishpos));
       case LSQUARE:
         acceptIt();
-        return parseStatement_Reference_LSQUARE(left);
+        return parseStatement_Reference_LSQUARE(left, statement_start);
       case LPAREN:
         acceptIt();
         ExprList args = new ExprList(); // empty default
@@ -380,32 +399,36 @@ public class Parser {
         }
         accept(TokenKind.RPAREN);
         accept(TokenKind.SEMICOLON);
-        return new CallStmt(left, args, nullpos);
+        return new CallStmt(left, args, new SourcePosition(statement_start, finishpos));
       default:
         parseError("Invalid Statement - After a reference, parser expects ASSIGNS, LSQUARE, or LPAREN");
         return null;
     }
   }
 
-  private Statement parseStatement_Reference_LSQUARE(Reference left) {
+  private Statement parseStatement_Reference_LSQUARE(Reference left, int statement_start) {
     Expression index = parseExpression();
     accept(TokenKind.RSQUARE);
     accept(TokenKind.ASSIGN);
     Expression value = parseExpression();
     accept(TokenKind.SEMICOLON);
-    return new IxAssignStmt(left, index, value, nullpos);
+    return new IxAssignStmt(left, index, value, new SourcePosition(statement_start, finishpos));
   }
 
   class ExpressionParser {
     // if this was a functional language, I would've generalized these parseE_X_() functions
     // into a list of functions that would try to either parse the next index in the list or
     // return the expression
+    private int expr_start;
+    ExpressionParser(int expr_start) {
+      this.expr_start = expr_start;
+    }
 
     public Expression parseE0() throws SyntaxError {
       Expression left = parseE1();
       while (token.kind == TokenKind.OR) {
         // Token op = acceptIt(); Expression right = parseE[i+1]() is integrated below
-        left = new BinaryExpr(new Operator(acceptIt()), left, parseE1(), nullpos);
+        left = new BinaryExpr(new Operator(acceptIt()), left, parseE1(), new SourcePosition(expr_start, finishpos));
       }
       return left;
     }
@@ -413,7 +436,7 @@ public class Parser {
     Expression parseE1() throws SyntaxError {
       Expression left = parseE2();
       while (token.kind == TokenKind.AND) {
-        left = new BinaryExpr(new Operator(acceptIt()), left, parseE2(), nullpos);
+        left = new BinaryExpr(new Operator(acceptIt()), left, parseE2(), new SourcePosition(expr_start, finishpos));
       }
       return left;
     }
@@ -421,7 +444,7 @@ public class Parser {
     Expression parseE2() throws SyntaxError {
       Expression left = parseE3();
       while (token.kind == TokenKind.EQUALS || token.kind == TokenKind.NEQ) {
-        left = new BinaryExpr(new Operator(acceptIt()), left, parseE3(), nullpos);
+        left = new BinaryExpr(new Operator(acceptIt()), left, parseE3(), new SourcePosition(expr_start, finishpos));
       }
       return left;
     }
@@ -430,7 +453,7 @@ public class Parser {
       Expression left = parseE4();
       while (token.kind == TokenKind.LEQ || token.kind == TokenKind.LT
           || token.kind == TokenKind.GEQ || token.kind == TokenKind.GT) {
-        left = new BinaryExpr(new Operator(acceptIt()), left, parseE4(), nullpos);
+        left = new BinaryExpr(new Operator(acceptIt()), left, parseE4(), new SourcePosition(expr_start, finishpos));
       }
       return left;
     }
@@ -438,7 +461,7 @@ public class Parser {
     Expression parseE4() throws SyntaxError {
       Expression left = parseE5();
       while (token.kind == TokenKind.ADD || token.kind == TokenKind.MINUS) {
-        left = new BinaryExpr(new Operator(acceptIt()), left, parseE5(), nullpos);
+        left = new BinaryExpr(new Operator(acceptIt()), left, parseE5(), new SourcePosition(expr_start, finishpos));
       }
       return left;
     }
@@ -446,7 +469,7 @@ public class Parser {
     Expression parseE5() throws SyntaxError {
       Expression left = parseE6();
       while (token.kind == TokenKind.MULTIPLY || token.kind == TokenKind.DIVIDE) {
-        left = new BinaryExpr(new Operator(acceptIt()), left, parseE6(), nullpos);
+        left = new BinaryExpr(new Operator(acceptIt()), left, parseE6(), new SourcePosition(expr_start, finishpos));
       }
       return left;
     }
@@ -455,7 +478,7 @@ public class Parser {
       // UnaryExpr
       if (token.kind == TokenKind.NOT || token.kind == TokenKind.MINUS) {
         Token unop = acceptIt();
-        return new UnaryExpr(new Operator(unop), parseE6(), nullpos);
+        return new UnaryExpr(new Operator(unop), parseE6(), new SourcePosition(expr_start, finishpos));
       }
       
       return parseE7();
@@ -474,29 +497,31 @@ public class Parser {
     }
 
     Expression parseRootExpr() throws SyntaxError {
+      int expr_start = startpos;
       // TODO: make sure switch cases don't match starters(Reference)
       boolean matchedSwitch = true;
       switch (token.kind) {
         // LiteralExpr
         //    IntLiteral
         case NUM:
-          return new LiteralExpr(new IntLiteral(acceptIt()), nullpos);
+          return new LiteralExpr(new IntLiteral(acceptIt()), new SourcePosition(expr_start, finishpos));
 
         //    BooleanLiteral
         case TRUE:
         case FALSE:
-          return new LiteralExpr(new BooleanLiteral(acceptIt()), nullpos);
+          return new LiteralExpr(new BooleanLiteral(acceptIt()), new SourcePosition(expr_start, finishpos));
 
         // NewExpr
         case NEW:
           acceptIt();
 
           // NewArrayExpr - Integer
+          int type_pos = startpos;
           if (acceptCheck(TokenKind.INT)) {
             accept(TokenKind.LSQUARE);
             Expression arraySize = parseExpression();
             accept(TokenKind.RSQUARE);
-            return new NewArrayExpr(new BaseType(TypeKind.INT, nullpos), arraySize, nullpos);
+            return new NewArrayExpr(new BaseType(TypeKind.INT, new SourcePosition(startpos)), arraySize, new SourcePosition(expr_start, finishpos));
           } 
           
           if (token.kind == TokenKind.ID) {
@@ -505,13 +530,13 @@ public class Parser {
             // NewObjectExpr
             if (acceptCheck(TokenKind.LPAREN)) {
               accept(TokenKind.RPAREN);
-              return new NewObjectExpr(new ClassType(new Identifier(id), nullpos), nullpos);
+              return new NewObjectExpr(new ClassType(new Identifier(id), new SourcePosition(type_pos)), new SourcePosition(expr_start, finishpos));
             // NewArrayExpr - Object
             } else {
               accept(TokenKind.LSQUARE);
               Expression arraySize = parseExpression();
               accept(TokenKind.RSQUARE);
-              return new NewArrayExpr(new ClassType(new Identifier(id), nullpos), arraySize, nullpos);
+              return new NewArrayExpr(new ClassType(new Identifier(id), new SourcePosition(type_pos)), arraySize, new SourcePosition(expr_start, finishpos));
             }
           }
           break;
@@ -543,7 +568,7 @@ public class Parser {
         if (acceptCheck(TokenKind.LSQUARE)) {
           Expression index = parseExpression();
           accept(TokenKind.RSQUARE);
-          return new IxExpr(ref, index, nullpos);
+          return new IxExpr(ref, index, new SourcePosition(expr_start, finishpos));
 
         // CallExpr
         } else if (acceptCheck(TokenKind.LPAREN)) {
@@ -552,14 +577,14 @@ public class Parser {
             args = parseArgList();
           }
           accept(TokenKind.RPAREN);
-          return new CallExpr(ref, args, nullpos);
+          return new CallExpr(ref, args, new SourcePosition(expr_start, finishpos));
 
         // Ref Expr
         } else { 
           // this may not work if the followers of Expression could be LSQUARE or LPAREN
           // no-op, epsilon case, may need to check followers...
           if (debugMode) System.out.println(":: Expression_Reference : Epsilon");
-          return new RefExpr(ref, nullpos);
+          return new RefExpr(ref, new SourcePosition(expr_start, finishpos));
         }
 
       } else {
@@ -569,10 +594,9 @@ public class Parser {
       }
     }
   }
-  private ExpressionParser ep = new ExpressionParser();
 
   private Expression parseExpression() throws SyntaxError {
-    return ep.parseE0();
+    return (new ExpressionParser(startpos)).parseE0();
   }
 
   /**
@@ -604,6 +628,7 @@ public class Parser {
    * @param expectedToken
    * @return the current token
    * @throws SyntaxError  if match fails
+   * SIDE EFFECTS: startpos and finishpos are updated
    */
   private Token accept(TokenKind expectedTokenKind) throws SyntaxError {
     if (token.kind == expectedTokenKind) {
@@ -611,7 +636,9 @@ public class Parser {
         pTrace();
       }
       Token old = token;
+      finishpos = old.posn == null ? finishpos : old.posn.finish;
       token = scanner.scan();
+      startpos = token.posn == null ? startpos : token.posn.start;
       return old;
     }
     else {
@@ -628,7 +655,6 @@ public class Parser {
    */
   private void parseError(String e) throws SyntaxError {
     reporter.reportError("Parse error: " + e);
-    // TODO: remember to comment this out when submitting
     if (debugMode) for (StackTraceElement stl : Thread.currentThread().getStackTrace()) {
       System.err.println(stl);
     }

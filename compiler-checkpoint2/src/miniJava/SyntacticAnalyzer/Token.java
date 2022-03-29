@@ -8,10 +8,11 @@ public class Token {
   public Token(TokenKind kind, String spelling, SourcePosition posn) {
     this.kind = checkKeyword(kind, spelling);
     this.spelling = spelling;
+    this.posn = posn;
   }
 
   public void print() {
-    System.out.println(kind.name() + " : " + spelling);
+    System.out.println(kind.name() + " : " + spelling + " @line: " + posn.start + "-" + posn.finish);
   }
 
   private static TokenKind checkKeyword(TokenKind k, String s) {
