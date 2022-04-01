@@ -16,7 +16,7 @@ public class VarDeclStmt extends Statement
     }
         
     public <A,R> R visit(Visitor<A,R> v, A o) {
-        return v.visitVardeclStmt(this, o);
+        return v.visitVarDeclStmt(this, o);
     }
 
     public VarDecl varDecl;
