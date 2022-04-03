@@ -4,6 +4,7 @@ import miniJava.SyntacticAnalyzer.Parser;
 import miniJava.SyntacticAnalyzer.Scanner;
 import miniJava.AbstractSyntaxTrees.ASTDisplay;
 import miniJava.AbstractSyntaxTrees.Package;
+import miniJava.ContextualAnalyzer.Identification;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,18 +33,31 @@ public class Compiler {
     ErrorReporter reporter = new ErrorReporter();
     Scanner scanner = new Scanner(stream, reporter);
     Parser parser = new Parser(scanner, reporter, debugMode);
-
+    
     if (debugMode) System.out.println("Syntactic analysis...");
     Package AST = parser.parse();
     ASTDisplay display = new ASTDisplay();
     if (debugMode) System.out.println("Syntactic analysis complete: ");
+    if (!reporter.hasErrors()) {
+      display.showTree(AST);
+    }
+    
+    if (debugMode) System.out.println("Identification...");
+    Identification identifier = new Identification(AST, reporter);
+    try {
+      identifier.identify();
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.exit(4); 
+    }
+    if (debugMode) System.out.println("Identification complete ");
     if (reporter.hasErrors()) {
 			System.out.println("Invalid miniJava program.");
 			System.exit(4);
 		}
 		else {
 			if (debugMode) System.out.println("Valid miniJava program.");
-      display.showTree(AST);
+      // display.showTree(AST);
 			System.exit(0);
 		}
 
