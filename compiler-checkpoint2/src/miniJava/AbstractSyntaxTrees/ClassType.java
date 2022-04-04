@@ -19,4 +19,12 @@ public class ClassType extends TypeDenoter
     }
 
     public Identifier className;
+
+    public boolean matches(TypeDenoter other) {
+        return super.matches(other) && other.typeKind != TypeKind.ERROR ? this.className.decl == ((ClassType) other).className.decl : super.matches(other); 
+    }
+
+    public String toString() {
+        return this.className.spelling + "(class)";
+    }
 }

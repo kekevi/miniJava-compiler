@@ -20,5 +20,13 @@ public class ArrayType extends TypeDenoter {
 	    }
 
 	    public TypeDenoter eltType;
+
+			public boolean matches(TypeDenoter other) {
+				return super.matches(other) && other.typeKind != TypeKind.ERROR ? this.eltType.matches(((ArrayType) other).eltType) : super.matches(other);
+			}
+
+			public String toString() {
+				return "Array of " + this.eltType.toString();
+			}
 	}
 

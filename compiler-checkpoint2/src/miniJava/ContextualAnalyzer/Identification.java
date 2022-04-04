@@ -312,10 +312,12 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
         reporter.reportError(prefix(ref.posn) + "'this' cannot be assigned to!");
       }
       case QualRef: {
+        ref.id = new Identifier(new Token(TokenKind.ID, context.currentClass().name, ref.posn), context.currentClass());
         context.setExternal(context.currentClass());
         break;
       }
       default: { // can only get here through RefExpr?
+        ref.id = new Identifier(new Token(TokenKind.ID, context.currentClass().name, ref.posn), context.currentClass());
         context.setExternal(context.currentClass()); // this case happens if we have a statement: `this;`
       }
     }
@@ -414,7 +416,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
       case QualRef: 
       default: {
         ClassDecl external = context.takeExternal();
-        FieldDecl field = env.getExternalField(symbol, external);
+        FieldDecl field = (FieldDecl) check(env.getExternalField(symbol, external), prefix(ref.posn) + "cannot find the field '" + symbol + "' of class '" + external == null ? "UNKNOWN" : external.name + "'.");
         if (field != null) {
           if (isUnvisible(external, field)) {
             reporter.reportError(prefix(ref.posn) + "cannot get private field '" + symbol + "'.");

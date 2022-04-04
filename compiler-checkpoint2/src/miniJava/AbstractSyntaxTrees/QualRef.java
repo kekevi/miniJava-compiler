@@ -7,7 +7,7 @@ package miniJava.AbstractSyntaxTrees;
 
 import miniJava.SyntacticAnalyzer.SourcePosition;
 
-public class QualRef extends Reference {
+public class QualRef extends Reference implements NamedRef {
 	
 	public QualRef(Reference ref, Identifier id, SourcePosition posn){
 		super(posn);
@@ -22,4 +22,9 @@ public class QualRef extends Reference {
 
 	public Reference ref;
 	public Identifier id;
+
+	@Override
+	public Identifier getId() {
+		return id;
+	}
 }

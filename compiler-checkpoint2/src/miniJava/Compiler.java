@@ -2,9 +2,11 @@ package miniJava;
 
 import miniJava.SyntacticAnalyzer.Parser;
 import miniJava.SyntacticAnalyzer.Scanner;
+import miniJava.AbstractSyntaxTrees.AST;
 import miniJava.AbstractSyntaxTrees.ASTDisplay;
 import miniJava.AbstractSyntaxTrees.Package;
 import miniJava.ContextualAnalyzer.Identification;
+import miniJava.ContextualAnalyzer.TypeChecking;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +52,14 @@ public class Compiler {
       e.printStackTrace();
       System.exit(4); 
     }
+    if (reporter.hasErrors()) {
+      System.out.println("Failed Identification");
+      System.exit(4);
+    }
     if (debugMode) System.out.println("Identification complete ");
+    TypeChecking typechecker = new TypeChecking(AST, reporter);
+    typechecker.typeCheck();
+
     if (reporter.hasErrors()) {
 			System.out.println("Invalid miniJava program.");
 			System.exit(4);
