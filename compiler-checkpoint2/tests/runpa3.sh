@@ -4,7 +4,7 @@
 # best way to run it:
 # ./compiler-checkpoint2/tests/runpa3.sh > ./compiler-checkpoint2/tests/tests2017pa3/zlog.txt 2>&1
 
-maindir=./compiler-checkpoint2/tests/tests2017pa3
+maindir=./compiler-checkpoint2/tests/tests2022
 summary=$maindir/summary.txt
 
 echo "" > $summary

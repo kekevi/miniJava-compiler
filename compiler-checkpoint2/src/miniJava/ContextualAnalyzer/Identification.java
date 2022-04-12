@@ -118,6 +118,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     }
     env.addScope(); // open 1st LOCAL scope
     for (Statement statement : md.statementList) {
+      context.statementReset();
       statement.visit(this, none);
     }
     env.removeScope(); // ends 1st LOCAL scope
@@ -164,6 +165,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     env.addScope(); // add n+1 LOCAL scope
     
     for (Statement statement : block.sl) {
+      context.statementReset();
       statement.visit(this, none);
     }
 
@@ -347,6 +349,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
         if (var != null) {
           ref.id.decl = var;
           context.setExternal(lookupClassType(var.type));
+          context.setInstanceEnsured();
           break;
         }
 
@@ -357,6 +360,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
           }
           ref.id.decl = field;
           context.setExternal(lookupClassType(field.type));
+          context.setInstanceEnsured();
           break;
         } 
 
@@ -420,6 +424,13 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
         if (field != null) {
           if (isUnvisible(external, field)) {
             reporter.reportError(prefix(ref.posn) + "cannot get private field '" + symbol + "'.");
+          }
+          if (field.isStatic) {
+            context.setInstanceEnsured();
+            // reporter.reportError(prefix(ref.posn) + "cannot get instance field '" + symbol + "'' in a static context! (referenced as if external)");
+          }
+          if (context.isInstanceEnsured() == false && !field.isStatic && context.isStaticContext()) {
+            reporter.reportError(prefix(ref.posn) + "cannot get instance field '" + symbol + "'' in a static context! (referenced as if external)");
           }
           ref.id.decl = field;
           context.setExternal(lookupClassType(field.type));
@@ -538,6 +549,7 @@ class Context {
   private MethodDecl method;
   private ClassDecl external;
   private String defining;
+  private boolean isInstanceEnsured;
   
   public Context() {
     // does nothing, must use methods!
@@ -568,6 +580,18 @@ class Context {
     ClassDecl external = this.external;
     this.external = null;
     return external;
+  }
+
+  public void statementReset() {
+    isInstanceEnsured = false;
+  }
+
+  public void setInstanceEnsured() {
+    isInstanceEnsured = true;
+  }
+
+  public boolean isInstanceEnsured() {
+    return isInstanceEnsured;
   }
 
   public void setDeclaring(String name) {
