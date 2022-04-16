@@ -10,6 +10,7 @@ import miniJava.AbstractSyntaxTrees.*;
 public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
   private AST ast;
   private ErrorReporter reporter;
+  private ReturnContext context;
 
   // expects an *identified* ast!!
   public TypeChecking(AST ast, ErrorReporter reporter) {
@@ -90,9 +91,15 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
 
   @Override
   public TypeDenoter visitMethodDecl(MethodDecl md, TypeDenoter arg) {
+    context = new ReturnContext(md);
     for (Statement statement : md.statementList) {
       statement.visit(this, md.type);
     }
+
+    if (!context.hasReturn()) {
+      reporter.reportError(prefix(md.posn) + "method '" + md.name + "' needs a return statement of type '" + md.type.toString() + "'.");
+    }
+    context = null;
     return md.type;
   }
 
@@ -198,6 +205,7 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
     TypeDenoter right = stmt.returnExpr.visit(this, null);
     TypeDenoter left = methodType; // left <==> expected
     check(left, right, prefix(stmt.posn) + "return value does not match method declaration" + suffix(left, right));
+    context.recordReturn();
     return null;
   }
 
@@ -207,7 +215,10 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
       reporter.reportError(prefix(stmt.posn) + "condition must be a boolean.");
     }
 
+    context.inConditional();
     stmt.thenStmt.visit(this, arg);
+    context.outConditional();
+
     if (stmt.elseStmt != null) {
       stmt.elseStmt.visit(this, arg);
     }
@@ -219,8 +230,11 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
     if (stmt.cond.visit(this, null).typeKind != TypeKind.BOOLEAN) {
       reporter.reportError(prefix(stmt.posn) + "condition must be a boolean.");
     }
+    context.inConditional();
 
     stmt.body.visit(this, null);
+
+    context.outConditional();
     return null;
   }
 
@@ -393,6 +407,41 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
   public TypeDenoter visitNullLiteral(NullLiteral nulllit, TypeDenoter arg) {
     return ErrorType(nulllit.posn);
   }
+}
 
-  
+class ReturnContext {
+  private boolean satisfied;
+  // private boolean pauseChecking; // we pause for if statement checking, cause even if `if (true) {... return}`, it can't ensure return
+  //  ^ the problem w/ this is that an `else` inside of an `if` would reenable checking, hence we need a semaphore type lock
+  private int condLevel; // the solution!
+
+  public ReturnContext (MethodDecl sig) {
+    if (sig.type.typeKind == TypeKind.VOID) {
+      this.satisfied = true;
+    }
+    condLevel = 0;
+  }
+
+  private boolean isCheckable() {
+    return condLevel == 0;
+  }
+
+  public void inConditional() {
+    condLevel += 1;
+  }
+
+  public void outConditional() {
+    condLevel -= 1;
+  }
+
+  /** Call only if a return statement is valid (has right typing) */
+  public void recordReturn() {
+    if (isCheckable()) {
+      satisfied = true;
+    }
+  }
+
+  public boolean hasReturn() {
+    return satisfied;
+  }
 }
