@@ -2,7 +2,6 @@ package miniJava.ContextualAnalyzer;
 
 import miniJava.AbstractSyntaxTrees.Package;
 import miniJava.SyntacticAnalyzer.SourcePosition;
-import miniJava.SyntacticAnalyzer.TokenKind;
 import miniJava.ErrorReporter;
 import miniJava.AbstractSyntaxTrees.*;
 
@@ -117,6 +116,11 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
       reporter.reportError(prefix(var.posn) + "void variables are not a thing. How did you get here?");
     }
     return var.type;
+  }
+
+  @Override
+  public TypeDenoter visitArrayLengthDecl(ArrayLengthDecl decl, TypeDenoter arg) {
+    return decl.type;
   }
 
   @Override

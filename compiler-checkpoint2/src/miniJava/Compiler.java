@@ -38,6 +38,10 @@ public class Compiler {
     
     if (debugMode) System.out.println("Syntactic analysis...");
     Package AST = parser.parse();
+    if (reporter.hasErrors()) {
+      System.out.println("Failed Parsing");
+      System.exit(4);
+    }
     ASTDisplay display = new ASTDisplay();
     if (debugMode) System.out.println("Syntactic analysis complete: ");
     if (!reporter.hasErrors()) {
