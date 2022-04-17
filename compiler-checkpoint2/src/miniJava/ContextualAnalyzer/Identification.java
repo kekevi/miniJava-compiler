@@ -12,6 +12,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
   private ErrorReporter reporter;
   private IdTable env;
   private Context context;
+  private boolean hasMain;
   private static final WatchOut none = WatchOut.None;
 
   public Identification(AST ast, ErrorReporter reporter) {
@@ -19,6 +20,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     this.reporter = reporter;
     this.env = new IdTable();
     this.context = new Context();
+    this.hasMain = false;
   }
 
   // main method: modifies the passed in AST by decorating it
@@ -52,6 +54,21 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     return decl;
   }
 
+  // helper
+  private boolean isMain(MethodDecl method) {
+    // public static void main(String[] args)
+    return (
+      !method.isPrivate // private
+      && method.isStatic // static
+      && method.type.typeKind == TypeKind.VOID // void
+      && method.name.equals("main")  // main
+      && method.parameterDeclList.size() == 1 // (??? args)
+      && method.parameterDeclList.get(0).type.typeKind == TypeKind.ARRAY // (??[] args)
+      && ((ArrayType) method.parameterDeclList.get(0).type).eltType.typeKind == TypeKind.CLASS // (?[] args)
+      && ((ClassType) ((ArrayType) method.parameterDeclList.get(0).type).eltType).className.spelling.equals("String") // (String[] args)
+    );
+  }
+
   @Override
   public Object visitPackage(Package prog, WatchOut arg) {
     env.addScope(); // add CLASS scope
@@ -72,6 +89,10 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     }
 
     env.removeScope(); // ends CLASS scope
+
+    if (!hasMain) {
+      reporter.reportError(prefix(prog.posn) + " each package needs a single main method in miniJava.");
+    }
     return null;
   }
 
@@ -94,6 +115,12 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     }
     for (MethodDecl method : cd.methodDeclList) {
       method.visit(this, none);
+      if (isMain(method)) {
+        if (hasMain) { // already has a `main` method
+          reporter.reportError(prefix(method.posn) + "main method has already been defined. miniJava only accepts one main method per package.");
+        }
+        hasMain = true;
+      } 
     }
 
     env.removeScope(); // ends MEMBER scope
