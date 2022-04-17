@@ -142,6 +142,12 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
   }
 
   @Override
+  public Object visitArrayLengthDecl(ArrayLengthDecl decl, WatchOut arg) {
+    System.out.println("Should not be able to get here.");
+    return null;
+  }
+
+  @Override
   public Object visitBaseType(BaseType type, WatchOut arg) {
     // primative types are always valid! and there are no more subnodes
     return null;
@@ -350,6 +356,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
           ref.id.decl = var;
           context.setExternal(lookupClassType(var.type));
           context.setInstanceEnsured();
+          context.checkArray(ref);
           break;
         }
 
@@ -361,6 +368,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
           ref.id.decl = field;
           context.setExternal(lookupClassType(field.type));
           context.setInstanceEnsured();
+          context.checkArray(ref);
           break;
         } 
 
@@ -389,7 +397,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
         if (field != null && !field.isStatic && context.isStaticContext()) {
           reporter.reportError(prefix(ref.posn) + "cannot get instance field '" + symbol + "'' in a static context!");
         } 
-        ref.id.decl = check(field, prefix(ref.posn) + "cannot find symbol '" + symbol + "' as an field or local variable.");
+        ref.id.decl = check(field, prefix(ref.posn) + "cannot find symbol '" + symbol + "' as a field or local variable.");
         context.setExternal(lookupClassType(field.type));
         break;
       }
@@ -405,6 +413,13 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     // children references are where this reference comes from (ie. left of a chain A.B.C)
     ref.ref.visit(this, WatchOut.QualRef);
     String symbol = ref.id.spelling;
+    if (symbol.equals("length") && context.isLastRefArray()) {
+      ref.id.decl = new ArrayLengthDecl(context.takeArrayRef(), ref.posn);
+      if (arg == WatchOut.AssignStmt) {
+        reporter.reportError(prefix(ref.posn) + "length of an array cannot be assigned to.");
+      }
+      return null; // valid length arg
+    }
     switch (arg) {
       case MethodCall: {
         ClassDecl external = context.takeExternal();
@@ -420,6 +435,10 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
       case QualRef: 
       default: {
         ClassDecl external = context.takeExternal();
+        if (external == null) {
+          reporter.reportError(prefix(ref.posn) + "could not read field '" + symbol + "'.");
+        }
+
         FieldDecl field = (FieldDecl) check(env.getExternalField(symbol, external), prefix(ref.posn) + "cannot find the field '" + symbol + "' of class '" + external == null ? "UNKNOWN" : external.name + "'.");
         if (field != null) {
           if (isUnvisible(external, field)) {
@@ -434,6 +453,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
           }
           ref.id.decl = field;
           context.setExternal(lookupClassType(field.type));
+          context.checkArray(ref);
           break;
         } 
         break;
@@ -550,6 +570,8 @@ class Context {
   private ClassDecl external;
   private String defining;
   private boolean isInstanceEnsured;
+  private boolean isLastRefArray;
+  private NamedRef arrayRef;
   
   public Context() {
     // does nothing, must use methods!
@@ -584,6 +606,7 @@ class Context {
 
   public void statementReset() {
     isInstanceEnsured = false;
+    isLastRefArray = false;
   }
 
   public void setInstanceEnsured() {
@@ -600,5 +623,22 @@ class Context {
 
   public String getDeclaring() {
     return this.defining;
+  }
+
+  public void checkArray(NamedRef ref) {
+    isLastRefArray = ref.getId().decl.type.typeKind == TypeKind.ARRAY;
+    if (isLastRefArray) {
+      arrayRef = ref;
+    }
+  }
+
+  public NamedRef takeArrayRef() {
+    NamedRef ref = arrayRef;
+    arrayRef = null;
+    return ref;
+  }
+
+  public boolean isLastRefArray() {
+    return isLastRefArray;
   }
 }

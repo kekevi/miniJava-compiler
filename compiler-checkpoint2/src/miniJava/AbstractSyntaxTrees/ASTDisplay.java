@@ -147,6 +147,15 @@ public class ASTDisplay implements Visitor<String,Object> {
         show(indent(arg), quote(vd.name) + " varname");
         return null;
     }
+
+    // pseudo Declaration
+    public Object visitArrayLengthDecl(ArrayLengthDecl decl, String arg) {
+        // NOTE: this code should never be executed
+        show(arg, decl);
+        decl.type.visit(this, indent(arg));
+        show(indent(arg), quote(decl.name) + " length");
+        return null;
+    }
  
 	
 	///////////////////////////////////////////////////////////////////////////////
