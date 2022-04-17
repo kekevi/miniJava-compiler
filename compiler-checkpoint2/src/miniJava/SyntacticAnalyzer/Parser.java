@@ -50,6 +50,11 @@ public class Parser {
     }
   }
 
+  // error helper
+  private String prefix(SourcePosition posn) {
+    return "*** line " + posn.start + ": ";
+  }
+
   // parse Program ::= (ClassDeclaration)* (eot)
   private ClassDeclList parseProgram() throws SyntaxError {
     ClassDeclList classes = new ClassDeclList();
@@ -189,7 +194,7 @@ public class Parser {
         }
         return isInt ? new BaseType(TypeKind.INT, type_pos) : new ClassType(new Identifier(prev), type_pos);
       default:
-        parseError("Invalid Type: Expecting int, boolean, identifier, or (int|id)[], but found: " + prev.kind);
+        parseError(prev, "Invalid Type: Expecting int, boolean, identifier, or (int|id)[], but found: " + prev.kind);
         return null;
     }
   }
@@ -229,7 +234,7 @@ public class Parser {
       acceptIt();
       left = new ThisRef(ref_pos);
     } else if (token.kind == TokenKind.THIS && innerRef != null) {
-      parseError("Invalid Reference: `this` cannot be an attribute of another Reference. (inside parseReference)");    
+      parseError(token, "Invalid Reference: `this` cannot be an attribute of another Reference. (inside parseReference)");    
       return null;
     } else if (innerRef != null && token.kind != TokenKind.THIS) {
       left = new QualRef(innerRef, new Identifier(accept(TokenKind.ID)), ref_pos);
@@ -312,7 +317,7 @@ public class Parser {
       if (acceptCheck(TokenKind.PERIOD)) { // Reference with an attribute
         if (token.kind == TokenKind.THIS) {
           // check added to parseReference(), but kept anyways
-          parseError("Invalid Reference (in parseStatement): `this` cannot be an attribute of another reference.");
+          parseError(token, "Invalid Reference (in parseStatement): `this` cannot be an attribute of another reference.");
         }
         Reference fullRef = parseReference(new IdRef(new Identifier(firstId), new SourcePosition(tbd_start, finishpos))); // guaranteed as current token chain is ID.ID(.ID)* 
         return parseStatement_Reference(fullRef, statement_start);
@@ -347,7 +352,7 @@ public class Parser {
       return parseStatement_Reference(reference, statement_start);
     }
 
-    parseError("Invalid Statement - expected valid command but instead got: " + token.kind);
+    parseError(token, "Invalid Statement - expected valid command but instead got: " + token.kind);
     return null;
   }
   
@@ -386,7 +391,7 @@ public class Parser {
         accept(TokenKind.SEMICOLON);
         return new CallStmt(left, args, new SourcePosition(statement_start, finishpos));
       default:
-        parseError("Invalid Statement - After a reference, parser expects ASSIGNS, LSQUARE, or LPAREN");
+        parseError(token, "Invalid Statement - After a reference, parser expects ASSIGNS, LSQUARE, or LPAREN");
         return null;
     }
   }
@@ -578,7 +583,7 @@ public class Parser {
 
       } else {
         // none of the required alternations a in Expr := ( a1 | a2 | ... )(binop Expr)* was selected
-        parseError("Expecting a valid expression before a binary operator.");
+        parseError(token, "Expecting a valid expression before a binary operator.");
         return null;
       }
     }
@@ -631,7 +636,7 @@ public class Parser {
       return old;
     }
     else {
-      parseError("Expecting '" + expectedTokenKind +
+      parseError(token, "Expecting '" + expectedTokenKind +
           "' but found '" + token.kind + "' with spelling: " + token.spelling);
       return token;
     }
@@ -642,8 +647,8 @@ public class Parser {
    * @param e  string with error detail
    * @throws SyntaxError
    */
-  private void parseError(String e) throws SyntaxError {
-    reporter.reportError("Parse error: " + e);
+  private void parseError(Token t, String e) throws SyntaxError {
+    reporter.reportError("Parse error @ line " + t.posn.start + ": " + e);
     if (debugMode) for (StackTraceElement stl : Thread.currentThread().getStackTrace()) {
       System.err.println(stl);
     }
