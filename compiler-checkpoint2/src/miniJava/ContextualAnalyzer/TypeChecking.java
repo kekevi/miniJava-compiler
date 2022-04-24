@@ -244,7 +244,7 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
 
   @Override
   public TypeDenoter visitUnaryExpr(UnaryExpr expr, TypeDenoter arg) {
-    TypeDenoter right = expr.visit(this, null);
+    TypeDenoter right = expr.expr.visit(this, null);
     switch (expr.operator.kind) {
       case NOT: {
         if (right.typeKind != TypeKind.BOOLEAN) {
