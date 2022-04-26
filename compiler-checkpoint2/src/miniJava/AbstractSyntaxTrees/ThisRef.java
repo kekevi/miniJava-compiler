@@ -24,4 +24,9 @@ public class ThisRef extends BaseRef implements NamedRef {
 	public Identifier getId() {
 		return id;
 	}
+
+	@Override
+	public boolean isQualified() {
+		return false;
+	}
 }

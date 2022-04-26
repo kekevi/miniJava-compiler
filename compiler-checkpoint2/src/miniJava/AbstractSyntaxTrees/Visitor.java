@@ -52,7 +52,7 @@ public interface Visitor<ArgType,ResultType> {
   // References
     public ResultType visitThisRef(ThisRef ref, ArgType arg);
     public ResultType visitIdRef(IdRef ref, ArgType arg);
-    public ResultType visitQRef(QualRef ref, ArgType arg);
+    public ResultType visitQualRef(QualRef ref, ArgType arg);
 
   // Terminals
     public ResultType visitIdentifier(Identifier id, ArgType arg);

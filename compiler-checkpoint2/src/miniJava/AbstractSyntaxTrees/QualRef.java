@@ -17,7 +17,7 @@ public class QualRef extends Reference implements NamedRef {
 
 	@Override
 	public <A, R> R visit(Visitor<A, R> v, A o) {
-		return v.visitQRef(this, o);
+		return v.visitQualRef(this, o);
 	}
 
 	public Reference ref;
@@ -26,5 +26,10 @@ public class QualRef extends Reference implements NamedRef {
 	@Override
 	public Identifier getId() {
 		return id;
+	}
+
+	@Override
+	public boolean isQualified() {
+		return true;
 	}
 }

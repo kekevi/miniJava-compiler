@@ -1,6 +1,7 @@
 package miniJava.ContextualAnalyzer;
 
 import miniJava.ErrorReporter;
+import miniJava.Predefined;
 import miniJava.AbstractSyntaxTrees.*;
 import miniJava.AbstractSyntaxTrees.Package;
 import miniJava.SyntacticAnalyzer.SourcePosition;
@@ -55,19 +56,19 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
   }
 
   // helper
-  private boolean isMain(MethodDecl method) {
-    // public static void main(String[] args)
-    return (
-      !method.isPrivate // private
-      && method.isStatic // static
-      && method.type.typeKind == TypeKind.VOID // void
-      && method.name.equals("main")  // main
-      && method.parameterDeclList.size() == 1 // (??? args)
-      && method.parameterDeclList.get(0).type.typeKind == TypeKind.ARRAY // (??[] args)
-      && ((ArrayType) method.parameterDeclList.get(0).type).eltType.typeKind == TypeKind.CLASS // (?[] args)
-      && ((ClassType) ((ArrayType) method.parameterDeclList.get(0).type).eltType).className.spelling.equals("String") // (String[] args)
-    );
-  }
+  // private boolean isMain(MethodDecl method) { // moved definition to MethodDecl as static
+  //   // public static void main(String[] args)
+  //   return (
+  //     !method.isPrivate // private
+  //     && method.isStatic // static
+  //     && method.type.typeKind == TypeKind.VOID // void
+  //     && method.name.equals("main")  // main
+  //     && method.parameterDeclList.size() == 1 // (??? args)
+  //     && method.parameterDeclList.get(0).type.typeKind == TypeKind.ARRAY // (??[] args)
+  //     && ((ArrayType) method.parameterDeclList.get(0).type).eltType.typeKind == TypeKind.CLASS // (?[] args)
+  //     && ((ClassType) ((ArrayType) method.parameterDeclList.get(0).type).eltType).className.spelling.equals("String") // (String[] args)
+  //   );
+  // }
 
   @Override
   public Object visitPackage(Package prog, WatchOut arg) {
@@ -115,7 +116,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     }
     for (MethodDecl method : cd.methodDeclList) {
       method.visit(this, none);
-      if (isMain(method)) {
+      if (MethodDecl.isMain(method)) {
         if (hasMain) { // already has a `main` method
           reporter.reportError(prefix(method.posn) + "main method has already been defined. miniJava only accepts one main method per package.");
         }
@@ -130,6 +131,9 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
   @Override
   public Object visitFieldDecl(FieldDecl fd, WatchOut arg) {
     // no identifier to link to declaration here (cause this is the decl)
+    if (!fd.isStatic) {
+      context.currentClass().instanceSize += 1; // for PA4 code gen
+    }
     fd.type.visit(this, none); // type: TypeDenoter, which each impl of TypeDenoter implements linking
     return null;
   }
@@ -248,6 +252,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
 
   @Override
   public Object visitReturnStmt(ReturnStmt stmt, WatchOut arg) {
+    stmt.ofMethod = context.currentMethod();
     if (stmt.returnExpr != null) {
       stmt.returnExpr.visit(this, none); // in type checking: check that return statement must be void if current method returns void!
     }
@@ -436,7 +441,7 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
   }
 
   @Override
-  public Object visitQRef(QualRef ref, WatchOut arg) {
+  public Object visitQualRef(QualRef ref, WatchOut arg) {
     // children references are where this reference comes from (ie. left of a chain A.B.C)
     ref.ref.visit(this, WatchOut.QualRef);
     String symbol = ref.id.spelling;
@@ -552,32 +557,6 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
   }
 }
 
-class Predefined {
-  private final static int PREDEFINED_LINE_NO = -1;
-  public static ClassDecl string = new ClassDecl("String", new FieldDeclList(), new MethodDeclList(), new SourcePosition(PREDEFINED_LINE_NO));
-  public static ClassDecl _printstream = new ClassDecl("_PrintStream", new FieldDeclList(), new MethodDeclList(new MethodDecl(new FieldDecl(false, false, new BaseType(TypeKind.VOID, new SourcePosition(PREDEFINED_LINE_NO)), "println", new SourcePosition(PREDEFINED_LINE_NO)), new ParameterDeclList(new ParameterDecl(new BaseType(TypeKind.INT, new SourcePosition(PREDEFINED_LINE_NO)), "n", new SourcePosition(PREDEFINED_LINE_NO))), new StatementList(), new SourcePosition(PREDEFINED_LINE_NO))), new SourcePosition(PREDEFINED_LINE_NO));
-  public static ClassDecl system = new ClassDecl(
-    "System", 
-    new FieldDeclList(
-      new FieldDecl(
-        false, 
-        true, 
-        new ClassType(
-          new Identifier(
-            new Token(
-              TokenKind.ID, 
-              "_PrintStream", 
-              new SourcePosition(PREDEFINED_LINE_NO)
-            ),
-            _printstream), new SourcePosition(PREDEFINED_LINE_NO)
-        ), 
-        "out", 
-        new SourcePosition(PREDEFINED_LINE_NO))
-    ), 
-    new MethodDeclList(), 
-    new SourcePosition(PREDEFINED_LINE_NO));
-}
-
 enum WatchOut {
   None, // equivalent to VarRef too
   VarDeclStmt,
@@ -619,6 +598,10 @@ class Context {
 
   public ClassDecl currentClass() {
     return this.self;
+  }
+
+  public MethodDecl currentMethod() {
+    return this.method;
   }
 
   public void setExternal(ClassDecl external) {

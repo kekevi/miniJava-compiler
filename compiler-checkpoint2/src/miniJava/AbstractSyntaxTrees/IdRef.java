@@ -24,4 +24,9 @@ public class IdRef extends BaseRef implements NamedRef {
 	public Identifier getId() {
 		return id;
 	}
+
+	@Override
+	public boolean isQualified() {
+		return false;
+	}
 }

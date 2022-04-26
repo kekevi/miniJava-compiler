@@ -340,7 +340,7 @@ public class ASTDisplay implements Visitor<String,Object> {
     	return null;
     }
         
-    public Object visitQRef(QualRef qr, String arg) {
+    public Object visitQualRef(QualRef qr, String arg) {
     	show(arg, qr);
     	qr.id.visit(this, indent(arg));
     	qr.ref.visit(this, indent(arg));

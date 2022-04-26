@@ -1,0 +1,218 @@
+echo
+File path echo could not be read.
+./compiler-checkpoint2/tests/oldPA4tests/fail401.java
+*** line 0:  each package needs a single main method in miniJava.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/fail402.java
+*** line 10: main method has already been defined. miniJava only accepts one main method per package.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/fail403.java
+*** line 0:  each package needs a single main method in miniJava.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/fail404.java
+*** line 0:  each package needs a single main method in miniJava.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/fail405.java
+*** line 0:  each package needs a single main method in miniJava.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/fail406.java
+*** line 0:  each package needs a single main method in miniJava.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/fail407.java
+*** line 0:  each package needs a single main method in miniJava.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/fail410.java
+*** line 8: length of an array cannot be assigned to.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/fail411.java
+A'.
+./compiler-checkpoint2/tests/oldPA4tests/fail412.java
+*** line 10: method 'check' needs a return statement of type 'INT'.
+Failed type checking .
+./compiler-checkpoint2/tests/oldPA4tests/pass401.java
+./compiler-checkpoint2/tests/oldPA4tests/pass401.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass402.java
+./compiler-checkpoint2/tests/oldPA4tests/pass402.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass403.java
+./compiler-checkpoint2/tests/oldPA4tests/pass403.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass404.java
+./compiler-checkpoint2/tests/oldPA4tests/pass404.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass405.java
+./compiler-checkpoint2/tests/oldPA4tests/pass405.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass406.java
+./compiler-checkpoint2/tests/oldPA4tests/pass406.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass407.java
+./compiler-checkpoint2/tests/oldPA4tests/pass407.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass408.java
+./compiler-checkpoint2/tests/oldPA4tests/pass408.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass409.java
+./compiler-checkpoint2/tests/oldPA4tests/pass409.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass410.java
+./compiler-checkpoint2/tests/oldPA4tests/pass410.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass411.java
+./compiler-checkpoint2/tests/oldPA4tests/pass411.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass412.java
+./compiler-checkpoint2/tests/oldPA4tests/pass412.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass413.java
+./compiler-checkpoint2/tests/oldPA4tests/pass413.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass414.java
+./compiler-checkpoint2/tests/oldPA4tests/pass414.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass415.java
+./compiler-checkpoint2/tests/oldPA4tests/pass415.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass416.java
+./compiler-checkpoint2/tests/oldPA4tests/pass416.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass417.java
+./compiler-checkpoint2/tests/oldPA4tests/pass417.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass420.java
+./compiler-checkpoint2/tests/oldPA4tests/pass420.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass421.java
+./compiler-checkpoint2/tests/oldPA4tests/pass421.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass422.java
+./compiler-checkpoint2/tests/oldPA4tests/pass422.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass423.java
+./compiler-checkpoint2/tests/oldPA4tests/pass423.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass424.java
+./compiler-checkpoint2/tests/oldPA4tests/pass424.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass425.java
+./compiler-checkpoint2/tests/oldPA4tests/pass425.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass426.java
+./compiler-checkpoint2/tests/oldPA4tests/pass426.mJAM
+./compiler-checkpoint2/tests/oldPA4tests/pass430.java
+./compiler-checkpoint2/tests/oldPA4tests/pass430.mJAM
+echo
+********** mJAM Interpreter (Version 2.3) **********
+Unable to load object file echo
+./compiler-checkpoint2/tests/oldPA4tests/pass401.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 1
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass402.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 2
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass403.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 3
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass404.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 4
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass405.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 5
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass406.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 6
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass407.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 7
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass408.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 8
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass409.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 9
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass410.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 10
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass411.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 11
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass412.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 12
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass413.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 13
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass414.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 14
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass415.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 15
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass416.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 16
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass417.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 17
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass420.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 20
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass421.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 21
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass422.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> -1
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass423.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 23
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass424.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 24
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass425.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 25
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass426.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 26
+
+*** Program has halted normally.
+./compiler-checkpoint2/tests/oldPA4tests/pass430.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 1
+>>> 2
+>>> 3
+>>> 4
+>>> 5
+>>> 6
+>>> 7
+>>> 8
+>>> 9
+>>> 10
+
+*** Program has halted normally.

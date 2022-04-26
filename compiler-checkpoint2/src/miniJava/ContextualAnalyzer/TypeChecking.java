@@ -380,7 +380,7 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
   }
 
   @Override
-  public TypeDenoter visitQRef(QualRef ref, TypeDenoter arg) {
+  public TypeDenoter visitQualRef(QualRef ref, TypeDenoter arg) {
     return ref.id.decl.type;
   }
 

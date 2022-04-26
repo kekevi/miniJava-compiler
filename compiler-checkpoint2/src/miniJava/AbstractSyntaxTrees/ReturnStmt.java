@@ -19,4 +19,5 @@ public class ReturnStmt extends Statement
 	}
 
 	public Expression returnExpr;
+	public MethodDecl ofMethod; // added in PA4 so return statement can get properties of the method
 }	

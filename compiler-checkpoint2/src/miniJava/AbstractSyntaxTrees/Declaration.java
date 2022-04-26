@@ -5,6 +5,7 @@
  */
 package miniJava.AbstractSyntaxTrees;
 
+import miniJava.CodeGenerator.Translation;
 import miniJava.SyntacticAnalyzer.SourcePosition;
 
 public abstract class Declaration extends AST {
@@ -17,4 +18,6 @@ public abstract class Declaration extends AST {
 	
 	public String name;
 	public TypeDenoter type;
+
+	public int offset = Translation.UNINIT_OFFSET; // PA 4
 }

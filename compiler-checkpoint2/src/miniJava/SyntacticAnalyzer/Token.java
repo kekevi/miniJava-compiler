@@ -15,6 +15,10 @@ public class Token {
     System.out.println(kind.name() + " : " + spelling + " @line: " + posn.start + "-" + posn.finish);
   }
 
+  public String toString() {
+    return kind + ":" + spelling;
+  }
+
   private static TokenKind checkKeyword(TokenKind k, String s) {
     if (k != TokenKind.ID) {
       return k;

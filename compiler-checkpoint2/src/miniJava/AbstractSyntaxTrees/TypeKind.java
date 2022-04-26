@@ -13,4 +13,8 @@ public enum TypeKind {
         ARRAY,
         UNSUPPORTED,
         ERROR;
+
+    public static boolean isObject(TypeKind kind) {
+        return kind == CLASS || kind == ARRAY;
+    }
 }
