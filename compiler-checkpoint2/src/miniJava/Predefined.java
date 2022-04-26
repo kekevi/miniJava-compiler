@@ -63,8 +63,6 @@ public class Predefined {
       new MethodDeclList(), 
       new SourcePosition(PREDEFINED_LINE_NO)
     );}
-
-    // TODO: identification process
   }
 
     static boolean p(boolean b) {
@@ -72,27 +70,8 @@ public class Predefined {
       return b;
     }
     public static boolean isPrintLn(Reference printlnRef) {
-      /*
-        class System { public static _PrintStream out; } 
-        class _PrintStream { public void println(int n){}; }
-      */
-      // QualRef println = (QualRef) printlnRef;
-      // System.out.println(printlnRef.getId().spelling);
-      // QualRef out = (QualRef) println.ref;
-      // System.out.println(out.getId().spelling);
-      // Reference system = out.ref;
       MethodDecl method = (MethodDecl) printlnRef.getId().decl;
-      // return (
-      //   p(!method.isPrivate)
-      //   && p(!method.isStatic)
-      //   && p(method.type.typeKind == TypeKind.VOID)
-      //   && p(method.name.equals("println"))
-      //   && p(method.parameterDeclList.size() == 1)
-      //   && p(method.parameterDeclList.get(0).type.typeKind == TypeKind.INT)
-      //   && p(printlnRef.isQualified())
-      //   && p(out.id.spelling.equals("out"))
-      //   && p(system.getId().spelling.equals("System"))
-      // );
+
       return (
         !method.isPrivate
         && !method.isStatic

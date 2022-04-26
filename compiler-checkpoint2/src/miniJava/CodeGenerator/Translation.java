@@ -12,7 +12,7 @@ import miniJava.mJAM.Machine.Op;
 import miniJava.mJAM.Machine.Prim;
 import miniJava.mJAM.Machine.Reg;
 
-public class Translation implements Visitor<Object, Object> {
+public class Translation implements Visitor<Heap<Integer>, Object> {
   private final static int UNDEFINED = 0; // MethodDecl.offset = 0 initially, but only mainInvoker can be at CB+0 ==> safe to use 0 as undefined method location
   private final static int TBD = -1; // an address that needs to be patched later
   private final static int FRAME_SIZE = 3;
@@ -30,7 +30,6 @@ public class Translation implements Visitor<Object, Object> {
 
   private AST ast;
   private ErrorReporter reporter;
-  private int mainAddr;
   private ArrayList<Patch> toPatch;
 
   /*
@@ -134,13 +133,14 @@ public class Translation implements Visitor<Object, Object> {
 
   /*
    *
-   * Declarations - only used for setup, in rest of generation, they should be accessed through ids
+   * Declarations - only used for setup, in rest of generation, they should be accessed through ids (do not visit)
    * 
    */
 
   private int func_main_addr;
+  private int ith_statfield = 0;
   @Override
-  public Object visitPackage(Package prog, Object arg) {
+  public Object visitPackage(Package prog, Heap<Integer> arg) {
     // main_invoker:
     Machine.emit(Op.LOADL, 0);
     Machine.emit(Prim.newarr);
@@ -167,9 +167,8 @@ public class Translation implements Visitor<Object, Object> {
     return null;
   }
 
-  int ith_statfield = 0;
   @Override
-  public Object visitClassDecl(ClassDecl cd, Object arg) {
+  public Object visitClassDecl(ClassDecl cd, Heap<Integer> arg) {
     for (MethodDecl method : cd.methodDeclList) {
       method.visit(this, null);
     }
@@ -178,13 +177,12 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitFieldDecl(FieldDecl fd, Object arg) {
-    // TODO Auto-generated method stub
+  public Object visitFieldDecl(FieldDecl fd, Heap<Integer> arg) {
     return null;
   }
 
   @Override
-  public Object visitMethodDecl(MethodDecl md, Object arg) {
+  public Object visitMethodDecl(MethodDecl md, Heap<Integer> arg) {
     md.offset = Machine.nextInstrAddr();
     if (MethodDecl.isMain(md)) { // guaranteed to be 1
       Machine.patch(func_main_addr, md.offset);
@@ -208,26 +206,29 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitParameterDecl(ParameterDecl pd, Object arg) {
-    // TODO Auto-generated method stub
+  public Object visitParameterDecl(ParameterDecl pd, Heap<Integer> arg) {
     return null;
   }
 
   @Override
-  public Object visitVarDecl(VarDecl decl, Object arg) {
-    // TODO Auto-generated method stub
+  public Object visitVarDecl(VarDecl decl, Heap<Integer> arg) {
     return null;
   }
 
   @Override
-  public Object visitArrayLengthDecl(ArrayLengthDecl decl, Object arg) {
-    // TODO: Auto-generated method stub
+  public Object visitArrayLengthDecl(ArrayLengthDecl decl, Heap<Integer> arg) {
     return null;
   }
 
+  /*
+   *
+   * Statements - after each statement, the expression stack should be cleaned up (unless ofc a variable slot is declared)
+   *  
+   */
+
   @Override
-  public Object visitBlockStmt(BlockStmt stmt, Object arg) {
-    Heap<Integer> ith_local = ((Heap<Integer>) arg);
+  public Object visitBlockStmt(BlockStmt stmt, Heap<Integer> arg) {
+    Heap<Integer> ith_local = arg;
     int num_prev_locals = ith_local.val;
     for (Statement statement : stmt.sl) {
       statement.visit(this, ith_local);
@@ -241,8 +242,8 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitVarDeclStmt(VarDeclStmt stmt, Object arg) {
-    Heap<Integer> ith_local = ((Heap<Integer>) arg);
+  public Object visitVarDeclStmt(VarDeclStmt stmt, Heap<Integer> arg) {
+    Heap<Integer> ith_local = arg;
     stmt.varDecl.offset = ith_local.val++;
 
     // Machine.emit(Op.PUSH, 1); // uninitialized
@@ -253,16 +254,7 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitAssignStmt(AssignStmt stmt, Object arg) {
-    // TODO: remove this
-    if (stmt.ref.getId().decl.name.equals("a") && stmt.ref.isQualified()) {
-      System.out.println(stmt.ref.getId().decl.offset);
-      Reference b = ((QualRef) stmt.ref).ref;
-      System.out.print(b.getId().decl.name);
-      System.out.println(b.getId().decl.offset);
-    } else if (stmt.ref.getId().decl.name.equals("a")) {
-      System.out.println(stmt.ref.posn + " " + stmt.ref.getId().decl.offset);
-    }
+  public Object visitAssignStmt(AssignStmt stmt, Heap<Integer> arg) {
     // should not be able to assign to a CLASS_REF or THIS_REF anyways
     stmt.val.visit(this, null);
     Object refType = stmt.ref.visit(this, null);
@@ -274,33 +266,14 @@ public class Translation implements Visitor<Object, Object> {
       return null;
     // } else if (refType == THIS_REF) { // storing current this val
       
-    } else { // STACK_REF TODO: check that if refType == THIS_REF makes sense
+    } else { // STACK_REF || THIS_REF (works as OB should be treated as a value)
       Machine.emit(Op.STOREI);
       return null;
     }
-
-    /* // probably more efficient (not complete tho) \/
-    if (TypeKind.isObject(stmt.ref.getId().decl.type.typeKind)) {
-      Object refType = stmt.ref.visit(this, null);
-      if (refType == INST_FIELD_REF) {
-        Machine.emit(Prim.fieldupd);
-      } else {
-        // is an object, but not an instance field
-      }
-    }
-    Object refType = stmt.ref.visit(this, null);
-    stmt.val.visit(this, null);
-    if (refType == INST_FIELD_REF) {
-      Machine.emit(Prim.fieldupd);
-      return null;
-    }
-
-    return null;
-    */ 
   }
 
   @Override
-  public Object visitIxAssignStmt(IxAssignStmt stmt, Object arg) {
+  public Object visitIxAssignStmt(IxAssignStmt stmt, Heap<Integer> arg) {
     // should not be assigned to a CLASS_REF or THIS_REF anyways
     Object refType = stmt.ref.visit(this, null);
     if (refType == INST_FIELD_REF) { // we must first get the address of the array
@@ -316,7 +289,7 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitCallStmt(CallStmt stmt, Object arg) {
+  public Object visitCallStmt(CallStmt stmt, Heap<Integer> arg) {
     Machine_emitMethodInvocation(stmt.argList, stmt.methodRef);
     if (stmt.methodRef.getId().decl.type.typeKind != TypeKind.VOID) {
       Machine.emit(Op.POP, 1); // remove return value if non-void method
@@ -325,7 +298,7 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitReturnStmt(ReturnStmt stmt, Object arg) {
+  public Object visitReturnStmt(ReturnStmt stmt, Heap<Integer> arg) {
     // Op.RETURN must also clear the arguments put onto the stack
     int num_args = stmt.ofMethod.parameterDeclList.size();
 
@@ -341,8 +314,8 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitIfStmt(IfStmt stmt, Object arg) {
-    Heap<Integer> ith_local = ((Heap<Integer>) arg);
+  public Object visitIfStmt(IfStmt stmt, Heap<Integer> arg) {
+    Heap<Integer> ith_local = arg;
 
     stmt.cond.visit(this, null);
     int jumpToElseOrEnd = Machine.nextInstrAddr();
@@ -365,8 +338,8 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitWhileStmt(WhileStmt stmt, Object arg) {
-    Heap<Integer> ith_local = ((Heap<Integer>) arg);
+  public Object visitWhileStmt(WhileStmt stmt, Heap<Integer> arg) {
+    Heap<Integer> ith_local = arg;
 
     int condLine = Machine.nextInstrAddr();
     stmt.cond.visit(this, null);
@@ -392,19 +365,18 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitThisRef(ThisRef ref, Object arg) {
+  public Object visitThisRef(ThisRef ref, Heap<Integer> arg) {
     // Machine.emit(Op.LOADA, Reg.OB, 0);
     return Machine_emitThis();
     // return null;
   }
 
   @Override
-  public Object visitIdRef(IdRef ref, Object arg) {
+  public Object visitIdRef(IdRef ref, Heap<Integer> arg) {
     if (ref.id.decl instanceof ClassDecl) {
       // eg. Other.staticfield
       // Machine.emit(Op.LOAD, Reg.SB, ref.id.decl.offset);
       // NOTE: the referencing should be done from the QualRef
-      // TODO: what should this return then?
       return CLASS_REF;
     } else if (ref.id.decl instanceof LocalDecl) {
       // eg. localx
@@ -437,7 +409,7 @@ public class Translation implements Visitor<Object, Object> {
   } 
 
   @Override
-  public Object visitQualRef(QualRef ref, Object arg) {
+  public Object visitQualRef(QualRef ref, Heap<Integer> arg) {
     if (ref.id.decl instanceof ArrayLengthDecl) {
       // as length can only be from RefExpr, we can just return the address of the array (which should be the reference to the left)
       return ref.ref.visit(this, null);
@@ -486,7 +458,7 @@ public class Translation implements Visitor<Object, Object> {
    */
 
   @Override
-  public Object visitUnaryExpr(UnaryExpr expr, Object arg) {
+  public Object visitUnaryExpr(UnaryExpr expr, Heap<Integer> arg) {
     expr.expr.visit(this, null);
     switch (expr.operator.kind) {
       case NOT:
@@ -503,7 +475,7 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitBinaryExpr(BinaryExpr expr, Object arg) {
+  public Object visitBinaryExpr(BinaryExpr expr, Heap<Integer> arg) {
     expr.left.visit(this, null);
     expr.right.visit(this, null);
     switch (expr.operator.kind) {
@@ -551,7 +523,7 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitRefExpr(RefExpr expr, Object arg) {
+  public Object visitRefExpr(RefExpr expr, Heap<Integer> arg) {
     // loads the value at that address
     
     Object refType = expr.ref.visit(this, null);
@@ -583,7 +555,7 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitIxExpr(IxExpr expr, Object arg) {
+  public Object visitIxExpr(IxExpr expr, Heap<Integer> arg) {
     Object refType = expr.ref.visit(this, null);
     if (refType == INST_FIELD_REF) {
       Machine.emit(Prim.fieldref);
@@ -596,14 +568,14 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitCallExpr(CallExpr expr, Object arg) {
+  public Object visitCallExpr(CallExpr expr, Heap<Integer> arg) {
     Machine_emitMethodInvocation(expr.argList, expr.functionRef);
     // typechecking should prevent a void method call (==> prevent System.out.println)
     return null;
   }
 
   @Override
-  public Object visitLiteralExpr(LiteralExpr expr, Object arg) {
+  public Object visitLiteralExpr(LiteralExpr expr, Heap<Integer> arg) {
     int val = 0;
     switch (expr.lit.kind) {
       case NUM:
@@ -627,7 +599,7 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitNewObjectExpr(NewObjectExpr expr, Object arg) {
+  public Object visitNewObjectExpr(NewObjectExpr expr, Heap<Integer> arg) {
     Machine.emit(Op.LOADL, CLASS_ADDR); // we do not save the Class object in memory, for our miniJava, classes are entirely a compilation entity
     Machine.emit(Op.LOADL, ((ClassDecl) expr.classtype.className.decl).instanceSize); // instanceSize must be set first!
     Machine.emit(Prim.newobj);
@@ -635,7 +607,7 @@ public class Translation implements Visitor<Object, Object> {
   }
 
   @Override
-  public Object visitNewArrayExpr(NewArrayExpr expr, Object arg) {
+  public Object visitNewArrayExpr(NewArrayExpr expr, Heap<Integer> arg) {
     expr.sizeExpr.visit(this, null);
     Machine.emit(Prim.newarr);
     return null;
@@ -649,42 +621,42 @@ public class Translation implements Visitor<Object, Object> {
   */
   
   @Override
-  public Object visitIdentifier(Identifier id, Object arg) {
+  public Object visitIdentifier(Identifier id, Heap<Integer> arg) {
     return null;
   }
   
   @Override
-  public Object visitOperator(Operator op, Object arg) {
+  public Object visitOperator(Operator op, Heap<Integer> arg) {
     return null;
   }
   
   @Override
-  public Object visitIntLiteral(IntLiteral num, Object arg) {
+  public Object visitIntLiteral(IntLiteral num, Heap<Integer> arg) {
     return null;
   }
   
   @Override
-  public Object visitBooleanLiteral(BooleanLiteral bool, Object arg) {
+  public Object visitBooleanLiteral(BooleanLiteral bool, Heap<Integer> arg) {
     return null;
   }
   
   @Override
-  public Object visitNullLiteral(NullLiteral nulllit, Object arg) {
+  public Object visitNullLiteral(NullLiteral nulllit, Heap<Integer> arg) {
     return null;
   }
 
   @Override
-  public Object visitBaseType(BaseType type, Object arg) {
+  public Object visitBaseType(BaseType type, Heap<Integer> arg) {
     return null;
   }
 
   @Override
-  public Object visitClassType(ClassType type, Object arg) {
+  public Object visitClassType(ClassType type, Heap<Integer> arg) {
     return null;
   }
 
   @Override
-  public Object visitArrayType(ArrayType type, Object arg) {
+  public Object visitArrayType(ArrayType type, Heap<Integer> arg) {
     return null;
   }
 }
