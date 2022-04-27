@@ -66,5 +66,6 @@ public enum TokenKind {
   RETURN,
   WHILE,
   IF,
-  ELSE
+  ELSE,
+  FOR
 }

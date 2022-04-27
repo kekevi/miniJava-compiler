@@ -64,6 +64,8 @@ public class Token {
         return TokenKind.IF;
       case "else":
         return TokenKind.ELSE;
+      case "for":
+        return TokenKind.FOR;
 
       default:
         return TokenKind.ID;

@@ -229,7 +229,7 @@ public class Translation implements Visitor<Heap<Integer>, Object> {
   @Override
   public Object visitBlockStmt(BlockStmt stmt, Heap<Integer> arg) {
     Heap<Integer> ith_local = arg;
-    int num_prev_locals = ith_local.val;
+    int num_prev_locals = ith_local.val; // standard procedure to start and stop scope
     for (Statement statement : stmt.sl) {
       statement.visit(this, ith_local);
     }
@@ -348,6 +348,34 @@ public class Translation implements Visitor<Heap<Integer>, Object> {
     stmt.body.visit(this, ith_local);
     Machine.emit(Op.JUMP, Reg.CB, condLine);
     Machine.patch(skipBody, Machine.nextInstrAddr());
+    return null;
+  }
+
+  @Override
+  public Object visitForStmt(ForStmt stmt, Heap<Integer> arg) {
+    Heap<Integer> ith_local = arg;
+    int num_prev_locals = ith_local.val; // standard procedure to start and stop scope
+
+    if (stmt.hasInit()) {
+      stmt.init.visit(this, ith_local);
+    }
+
+    int condLine = Machine.nextInstrAddr();
+    int skipBodyLine = -1000;
+    if (stmt.hasCond()) {
+      stmt.cond.visit(this, null);
+      skipBodyLine = Machine.nextInstrAddr();
+      Machine.emit(Op.JUMPIF, Machine.falseRep, Reg.CB, TBD);
+    }
+    stmt.body.visit(this, ith_local);
+    if (stmt.hasUpdate()) {
+      stmt.update.visit(this, null); // we do not pass ith_local as you can't declare a local here anyways
+    }
+    Machine.emit(Op.JUMP, Reg.CB, condLine);
+    Machine.patch(skipBodyLine, Machine.nextInstrAddr());
+
+    Machine.emit(Op.POP, ith_local.val-num_prev_locals); // reduce an instruction by removing POP if 0 vars created
+    ith_local.val = num_prev_locals;
     return null;
   }
 

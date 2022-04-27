@@ -17,6 +17,7 @@ public interface Visitor<ArgType,ResultType> {
   // Declarations
     public ResultType visitClassDecl(ClassDecl cd, ArgType arg);
     public ResultType visitFieldDecl(FieldDecl fd, ArgType arg);
+    // public ResultType visitFieldDeclInit(FieldDeclInit fd, ArgType arg);
     public ResultType visitMethodDecl(MethodDecl md, ArgType arg);
     public ResultType visitParameterDecl(ParameterDecl pd, ArgType arg);
     public ResultType visitVarDecl(VarDecl decl, ArgType arg);
@@ -38,6 +39,7 @@ public interface Visitor<ArgType,ResultType> {
     public ResultType visitReturnStmt(ReturnStmt stmt, ArgType arg);
     public ResultType visitIfStmt(IfStmt stmt, ArgType arg);
     public ResultType visitWhileStmt(WhileStmt stmt, ArgType arg);
+    public ResultType visitForStmt(ForStmt stmt, ArgType arg);
     
   // Expressions
     public ResultType visitUnaryExpr(UnaryExpr expr, ArgType arg);

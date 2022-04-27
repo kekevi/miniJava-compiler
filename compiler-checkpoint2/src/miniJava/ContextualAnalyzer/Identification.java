@@ -281,6 +281,62 @@ public class Identification implements Visitor<WatchOut, Object> { // just <ArgT
     return null;
   }
 
+  /** checks for valid non-body statements in for loops
+   * @param s internal statement of ForStmt
+   * @param isInit true if testing forStmt.cond, false if testing forStmt.increment
+   */
+  private boolean checkValidForLoop(Statement s, boolean isInit) {
+    /* 
+      init statements can only be:
+        in miniJava: VarDeclStmt, AssignStmt, IxAssignStmt, CallStmt
+        not in miniJava: NewObjectStmt, In/DecrementStatements
+
+      update statements can only be:
+        same as above but cannot be VarDeclStmt!!
+
+      with so many exceptions, I will not use a strict visitor pattern
+    */
+    boolean valid;
+    if (isInit) {
+      valid = s instanceof VarDeclStmt || s instanceof AssignStmt || s instanceof IxAssignStmt || s instanceof CallStmt;
+      if (!valid) {
+        reporter.reportError(prefix(s.posn) + "initialization statement of for loop can only declare a variable, assign to a variable, or call a method.");
+      }
+    } else {
+      valid = s instanceof AssignStmt || s instanceof IxAssignStmt || s instanceof CallStmt;
+      if (!valid) {
+        reporter.reportError(prefix(s.posn) + "update statement of for loop can only assign to a variable or call a statement.");
+      }
+    }
+    return valid;
+  }
+
+  @Override
+  public Object visitForStmt(ForStmt stmt, WatchOut arg) {
+    // we must wrap for Statement in its own scope
+    env.addScope();
+    
+    // for loops suck: https://docs.oracle.com/javase/specs/jls/se7/html/jls-14.html#jls-14.14
+    if (stmt.hasInit()) {
+      checkValidForLoop(stmt.init, true);
+      stmt.init.visit(this, none);
+    }
+
+    if (stmt.hasCond()) {
+      stmt.cond.visit(this, none);
+    }
+
+    if (stmt.hasUpdate()) {
+      // NOTE: below is unneccessary as for loop's update statement is a subset of regular Statement, hence Parser will catch problems
+      checkValidForLoop(stmt.update, false);
+      stmt.update.visit(this, WatchOut.VarDeclStmt); // don't need WatchOut because `checkValidForLoop` does it
+    }
+    stmt.body.visit(this, WatchOut.VarDeclStmt);
+
+    env.removeScope();
+    return null;
+  }
+
   @Override
   public Object visitUnaryExpr(UnaryExpr expr, WatchOut arg) {
     expr.expr.visit(this, none);

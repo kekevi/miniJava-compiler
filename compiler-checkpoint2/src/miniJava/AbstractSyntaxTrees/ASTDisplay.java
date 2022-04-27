@@ -255,6 +255,20 @@ public class ASTDisplay implements Visitor<String,Object> {
         stmt.body.visit(this, indent(arg));
         return null;
     }
+
+    public Object visitForStmt(ForStmt stmt, String arg) {
+        show(arg, stmt);
+        show(arg, "(");
+        if (stmt.hasInit())
+            stmt.init.visit(this, indent(arg));
+        if (stmt.hasCond()) 
+            stmt.cond.visit(this, indent(arg));
+        if (stmt.hasUpdate())
+            stmt.update.visit(this, indent(arg));
+        show(arg, ")");
+        stmt.body.visit(this, indent(arg));
+        return null;
+    }
     
 
 	///////////////////////////////////////////////////////////////////////////////

@@ -14,6 +14,13 @@ public class MethodDecl extends MemberDecl {
     parameterDeclList = pl;
     statementList = sl;
   }
+
+  // why was this not defined originally??
+  public MethodDecl(boolean isPrivate, boolean isStatic, TypeDenoter t, String name, ParameterDeclList pl, StatementList sl, SourcePosition posn) {
+    super(isPrivate, isStatic, t, name, posn);
+    parameterDeclList = pl;
+    statementList = sl;
+  }
   
   public <A, R> R visit(Visitor<A, R> v, A o) {
     return v.visitMethodDecl(this, o);

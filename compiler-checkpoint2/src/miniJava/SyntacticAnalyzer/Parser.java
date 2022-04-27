@@ -120,7 +120,7 @@ public class Parser {
         statements.add(parseStatement());
       }
       accept(TokenKind.RCURLY);
-      return new MemberSpecifier(new MethodDecl(new FieldDecl(isPrivate, isStatic, new BaseType(TypeKind.VOID, new SourcePosition(void_pos)), methodname, new SourcePosition(classitem_start, finishpos)), params, statements, new SourcePosition(classitem_start, finishpos)), false);
+      return new MemberSpecifier(new MethodDecl(isPrivate, isStatic, new BaseType(TypeKind.VOID, new SourcePosition(void_pos)), methodname, params, statements, new SourcePosition(classitem_start, finishpos)), false);
     }
 
     TypeDenoter type = parseType();
@@ -145,7 +145,7 @@ public class Parser {
       statements.add(parseStatement());
     }
     accept(TokenKind.RCURLY);
-    return new MemberSpecifier(new MethodDecl(new FieldDecl(isPrivate, isStatic, type, name, new SourcePosition(classitem_start, finishpos)), params, statements, new SourcePosition(classitem_start, finishpos)), false);
+    return new MemberSpecifier(new MethodDecl(isPrivate, isStatic, type, name, params, statements, new SourcePosition(classitem_start, finishpos)), false);
   }
 
   /**
@@ -255,6 +255,35 @@ public class Parser {
     return parseReference(null);
   }
 
+  private Statement parseForUpdateStatement() throws SyntaxError {
+    int statement_start = startpos;
+    Reference ref = parseReference();
+    switch (token.kind) {
+      case ASSIGN:
+        acceptIt();
+        Expression assignExpr = parseExpression();
+        return new AssignStmt(ref, assignExpr, new SourcePosition(statement_start, finishpos));
+      case LSQUARE:
+        acceptIt();
+        Expression ix = parseExpression();
+        accept(TokenKind.RSQUARE);
+        accept(TokenKind.ASSIGN);
+        Expression ixAssignExpr = parseExpression();
+        return new IxAssignStmt(ref, ix, ixAssignExpr, new SourcePosition(statement_start, finishpos));
+      case LPAREN:
+        acceptIt();
+        ExprList args = new ExprList(); // empty default
+        if (token.kind != TokenKind.RPAREN) {
+          args = parseArgList();
+        }
+        accept(TokenKind.RPAREN);
+        return new CallStmt(ref, args, new SourcePosition(statement_start, finishpos));
+      default:
+        parseError(token, "Invalid statement for for loop's update. (can only be of assignment or method call in miniJava)");
+        return null;
+    }
+  }
+
   private Statement parseStatement() throws SyntaxError {
     int statement_start = startpos;
     // checks RETURN, IF, WHILE, and LCURLY cases
@@ -291,6 +320,27 @@ public class Parser {
         Statement whileBlock = parseStatement();
         return new WhileStmt(whileCondition, whileBlock, new SourcePosition(statement_start, finishpos));
 
+      // ForStmt
+      case FOR:
+        acceptIt();
+        Statement forInit = null; Expression forCond = null; Statement forUpdate = null;
+        accept(TokenKind.LPAREN);
+        if (token.kind != TokenKind.SEMICOLON) {
+          forInit = parseStatement();
+        } else {
+          acceptIt();
+        }
+        if (token.kind != TokenKind.SEMICOLON) {
+          forCond = parseExpression();
+        } 
+        accept(TokenKind.SEMICOLON);
+        if (token.kind != TokenKind.RPAREN) {
+          forUpdate = parseForUpdateStatement();
+        }
+        accept(TokenKind.RPAREN);
+        Statement forBody = parseStatement();
+        return new ForStmt(forInit, forCond, forUpdate, forBody, new SourcePosition(statement_start, finishpos));
+      
       // BlockStmt
       case LCURLY:
         acceptIt();

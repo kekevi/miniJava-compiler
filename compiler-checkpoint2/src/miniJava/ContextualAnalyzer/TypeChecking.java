@@ -236,9 +236,32 @@ public class TypeChecking implements Visitor<TypeDenoter, TypeDenoter> {
     }
     context.inConditional();
 
-    stmt.body.visit(this, null);
+    stmt.body.visit(this, arg);
 
     context.outConditional();
+    return null;
+  }
+
+  @Override
+  public TypeDenoter visitForStmt(ForStmt stmt, TypeDenoter arg) {
+    if (stmt.hasInit()) {
+      stmt.init.visit(this, null);
+    }
+
+    if (stmt.hasCond()) {
+      if (stmt.cond.visit(this, null).typeKind != TypeKind.BOOLEAN) {
+        reporter.reportError(prefix(stmt.cond.posn) + "condition must be a boolean.");
+      }
+    }
+
+    if (stmt.hasUpdate()) {
+      stmt.update.visit(this, null);
+    }
+
+    context.inConditional();
+    stmt.body.visit(this, arg);
+    context.outConditional();
+
     return null;
   }
 

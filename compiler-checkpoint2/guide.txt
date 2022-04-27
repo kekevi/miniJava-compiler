@@ -1,0 +1,11 @@
+# miniJava Compiler - Kevin Chen
+
+## Scope of Project
+- basic PA1-PA4 functionality
+- static field initialization
+- parameterized class constructors
+- for loops
+
+## Summary of AST Class Changes
+- All References have an identifier to access their declaration, set during identification.
+- Added custom toString() to Type and Token enums to facilitate error reporter messages and testing.
