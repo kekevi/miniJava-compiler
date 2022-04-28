@@ -41,8 +41,5 @@ bin
 # test results
 *.result
 *.outresult
-tests2022
-tests2017pa3
-oldPA4tests
-compiler-checkpoint2/pa5_tests/for_loops/*.mJAM
-compiler-checkpoint2/pa5_tests/for_loops/*.asm
+*.mJAM
+*.asm

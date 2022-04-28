@@ -1,15 +1,4 @@
-# miniJava-compiler
-A compiler for miniJava for COMP 520 Spring 2022 at UNC.
-
-## How to Use
-* Clone this GitHub repository to your computer. Compile the src files into a bin folder in project root.
-* Write some miniJava in a file, save it with `.java`. You can change the extension for the make and debug scripts inside the file.
-* In the terminal, type `./make.sh filename.java`. This will run the program and create assembly code (`.asm`) and an object file (`.mJAM`).
-* Type `./debug.sh filename.java` to run the debugger.
-
-
-Below is a copy of `guide.txt`, which is used for the PA5 submission.
-# miniJava Compiler
+# miniJava Compiler - Kevin Chen
 
 ## Scope of Project
 - basic PA1-PA4 functionality
