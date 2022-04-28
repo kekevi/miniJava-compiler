@@ -19,7 +19,7 @@ ConstructorDeclaration ::= Visibility *id* **(** ParamList? **)** **{** Statemen
 
 Statement (ForStmt) ::= 
   ... |
-  **for** **(** (Statement | **;**) (Expression | **;**) ForUpdateStatement **)** Statement 
+  **for** **(** (Statement | **;**) (Expression? **;**) ForUpdateStatement **)** Statement 
   | ...
 
 ForUpdateStatement ::= \[AssignStmts, IxAssignStmts, CallStmts without the **;** ending\]
