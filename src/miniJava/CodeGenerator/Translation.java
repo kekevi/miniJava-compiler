@@ -562,14 +562,12 @@ public class Translation implements Visitor<Heap<Integer>, Object> {
       int shortCircuitJumpLine = Machine.nextInstrAddr();
       switch (opKind) {
         case AND:
-          // Machine.emit(Op.LOAD, Reg.ST, -1); // make a copy for jump to check on
           Machine.emit(Op.JUMPIF, Machine.falseRep, Reg.CB, TBD);
           Machine.emit(Op.LOADL, Machine.trueRep);
           expr.right.visit(this, null);
           Machine.emit(Prim.and);
           break;
         case OR:
-          // Machine.emit(Op.LOAD, Reg.ST, -1); // make a copy for jump to check on
           Machine.emit(Op.JUMPIF, Machine.trueRep, Reg.CB, TBD);
           Machine.emit(Op.LOADL, Machine.falseRep);
           expr.right.visit(this, null);
