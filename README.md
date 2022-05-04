@@ -7,6 +7,24 @@ A compiler for miniJava for COMP 520 Spring 2022 at UNC.
 * In the terminal, type `./make.sh filename.java`. This will run the program and create assembly code (`.asm`) and an object file (`.mJAM`).
 * Type `./debug.sh filename.java` to run the debugger.
 
+## Modified Grammar
+
+The grammar after adding in the PA5 extra credit is a bit different compared to how it was described in PA1:
+
+ClassDeclaration ::= **class** *id* **{** (FieldDeclaration | MethodDeclaration | ConstructorDeclaration)* **}**
+
+FieldDeclaration ::= Visibility Access Type *id* ( **=** Expression )? **;**
+
+ConstructorDeclaration ::= Visibility *id* **(** ParamList? **)** **{** Statement* **}**
+
+Statement (ForStmt) ::= 
+  ... |
+  **for** **(** (Statement | **;**) (Expression? **;**) ForUpdateStatement **)** Statement 
+  | ...
+
+ForUpdateStatement ::= \[AssignStmts, IxAssignStmts, CallStmts without the **;** ending\]
+
+Expression (NewObjectExpr) ::= **new** *id* **(** ArgList? **)**
 
 Below is a copy of `guide.txt`, which is used for the PA5 submission.
 # miniJava Compiler
