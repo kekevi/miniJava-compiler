@@ -1,0 +1,67 @@
+PA5 results for kekevi
+
+Scoring:
+  failyyy yyy<500 tests earn 1 point for exit(4)
+  fail5xx tests earn 2 points for exit(4)
+  pass4xx tests earn 2 points for exit(0) AND correct mJAM execution
+  pass5xx tests earn 3 points for exit(0) AND correct mJAM execution
+=============================================================================
+
+Test fail117: was correctly rejected.                          Points = 1
+Test fail131: was correctly rejected.                          Points = 1
+Test fail145: was correctly rejected.                          Points = 1
+Test fail155: was correctly rejected.                          Points = 1
+Test fail164: was correctly rejected.                          Points = 1
+Test fail318: was correctly rejected.                          Points = 1
+Test fail327: was correctly rejected.                          Points = 1
+Test fail328: was correctly rejected.                          Points = 1
+Test fail329: was correctly rejected.                          Points = 1
+Test fail330: was correctly rejected.                          Points = 1
+Test fail340: was correctly rejected.                          Points = 1
+Test fail341: was correctly rejected.                          Points = 1
+Test fail370: was correctly rejected.                          Points = 1
+Test fail407: was correctly rejected.                          Points = 1
+Test fail410: was correctly rejected.                          Points = 1
+Test fail412: was correctly rejected.                          Points = 1
+Test fail501: was correctly rejected.                          Points = 1
+Test pass401: mJAM program yields correct result!              Points = 2
+Test pass402: mJAM program yields correct result!              Points = 2
+Test pass403: mJAM program yields correct result!              Points = 2
+Test pass404: mJAM program yields correct result!              Points = 2
+Test pass405: mJAM program yields correct result!              Points = 2
+Test pass406: mJAM program yields correct result!              Points = 2
+Test pass407: mJAM program yields correct result!              Points = 2
+Test pass408: mJAM program yields correct result!              Points = 2
+Test pass409: mJAM program yields correct result!              Points = 2
+Test pass410: mJAM program yields correct result!              Points = 2
+Test pass411: mJAM program yields correct result!              Points = 2
+Test pass412: mJAM program yields correct result!              Points = 2
+Test pass413: mJAM program yields correct result!              Points = 2
+Test pass414: mJAM program yields correct result!              Points = 2
+Test pass415: mJAM program yields correct result!              Points = 2
+Test pass416: mJAM program yields correct result!              Points = 2
+Test pass417: mJAM program yields correct result!              Points = 2
+Test pass420: INTERPRETER FAILED in execution of mJAM program. Points = 0
+Test pass421: mJAM program yields correct result!              Points = 2
+Test pass422: mJAM program yields correct result!              Points = 2
+Test pass423: mJAM program yields correct result!              Points = 2
+Test pass424: mJAM program yields correct result!              Points = 2
+Test pass425: mJAM program yields correct result!              Points = 2
+Test pass426: mJAM program yields correct result!              Points = 2
+Test pass501: INTERPRETER FAILED in execution of mJAM program. Points = 0
+Test pass502: mJAM program yields INCORRECT RESULT.            Points = 0
+Test pass503: mJAM program yields correct result!              Points = 3
+Test pass504: mJAM program yields correct result!              Points = 3
+Test pass505: mJAM program yields correct result!              Points = 3
+Test pass507: mJAM program yields correct result!              Points = 3
+Test pass508: mJAM program yields correct result!              Points = 3
+Test pass510: mJAM program yields correct result!              Points = 3
+Test pass520: mJAM program yields correct result!              Points = 3
+Test pass530: mJAM program yields correct result!              Points = 3
+
+
+Runtime errors: 2  (2 errors and 0 hangs)
+Fail testcases:   Correct: 17   Incorrect: 0
+Pass testcases:   Correct: 41   Incorrect: 1
+
+Total Points Earned: 97

@@ -79,7 +79,7 @@ unused
 ### JUMPIF
 * n d r
 * val
-* removes val from stack; if val == n ==> sets CP to d+r
+* removes val from stack (no matter if jumped); if val == n ==> sets CP to d+r
 
 ### HALT
 * n

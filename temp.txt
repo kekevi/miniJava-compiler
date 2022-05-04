@@ -1,0 +1,353 @@
+echo
+File path echo could not be read.
+./tests/official_testcases/pa5_tests/fail117.java
+Scan Error:  Expected `*/` to close the multiline comment before the end of file.
+Failed parsing.
+./tests/official_testcases/pa5_tests/fail131.java
+Scan Error:  Expected `*/` to close the multiline comment before the end of file.
+Failed parsing.
+./tests/official_testcases/pa5_tests/fail145.java
+Parse error @ line 3: Expecting 'ID' but found 'LSQUARE' with spelling: [
+Failed parsing.
+./tests/official_testcases/pa5_tests/fail155.java
+Parse error @ line 4: Invalid Statement - After a reference, parser expects ASSIGNS, LSQUARE, or LPAREN
+Failed parsing.
+./tests/official_testcases/pa5_tests/fail164.java
+Parse error @ line 5: Expecting 'ID' but found 'ASSIGN' with spelling: =
+Failed parsing.
+./tests/official_testcases/pa5_tests/fail318.java
+*** line 7: cannot get instance field 'x'' in a static context!
+Failed identification.
+./tests/official_testcases/pa5_tests/fail327.java
+*** line 7: the reference 'F02' cannot be resolved to a field or local variable.
+*** line 7: cannot find symbol 'F02' as a field or local variable.
+./tests/official_testcases/pa5_tests/fail328.java
+F05'.
+*** line 8: could not read field 'next'.
+./tests/official_testcases/pa5_tests/fail329.java
+*** line 8: could not read field 'foo'.
+./tests/official_testcases/pa5_tests/fail330.java
+*** line 9: 'this()' call can only be used with constructors! (NOT IMPLEMENTED YET) caller:MethodCall
+Failed identification.
+./tests/official_testcases/pa5_tests/fail340.java
+*** line 17: 'this' cannot be used in static context!
+Failed identification.
+./tests/official_testcases/pa5_tests/fail341.java
+*** line 18: the reference 'TestClass' cannot be resolved to a field or local variable.
+*** line 18: cannot find symbol 'TestClass' as a field or local variable.
+./tests/official_testcases/pa5_tests/fail370.java
+*** line 17: the reference 'TestClass' cannot be resolved to a field or local variable.
+*** line 17: cannot find symbol 'TestClass' as a field or local variable.
+./tests/official_testcases/pa5_tests/fail407.java
+*** line 0:  each package needs a single main method in miniJava.
+Failed identification.
+./tests/official_testcases/pa5_tests/fail410.java
+*** line 8: length of an array cannot be assigned to.
+Failed identification.
+./tests/official_testcases/pa5_tests/fail412.java
+*** line 10: method 'check' needs a return statement of type 'INT'.
+Failed type checking.
+./tests/official_testcases/pa5_tests/fail501.java
+*** line 10: cannot get private field 's'.
+Failed identification.
+./tests/official_testcases/pa5_tests/pass320.java
+./tests/official_testcases/pa5_tests/pass320.mJAM
+./tests/official_testcases/pa5_tests/pass326.java
+./tests/official_testcases/pa5_tests/pass326.mJAM
+./tests/official_testcases/pa5_tests/pass348.java
+./tests/official_testcases/pa5_tests/pass348.mJAM
+./tests/official_testcases/pa5_tests/pass350.java
+./tests/official_testcases/pa5_tests/pass350.mJAM
+./tests/official_testcases/pa5_tests/pass360.java
+./tests/official_testcases/pa5_tests/pass360.mJAM
+./tests/official_testcases/pa5_tests/pass364.java
+./tests/official_testcases/pa5_tests/pass364.mJAM
+./tests/official_testcases/pa5_tests/pass381.java
+./tests/official_testcases/pa5_tests/pass381.mJAM
+./tests/official_testcases/pa5_tests/pass383.java
+./tests/official_testcases/pa5_tests/pass383.mJAM
+./tests/official_testcases/pa5_tests/pass394.java
+./tests/official_testcases/pa5_tests/pass394.mJAM
+./tests/official_testcases/pa5_tests/pass399.java
+./tests/official_testcases/pa5_tests/pass399.mJAM
+./tests/official_testcases/pa5_tests/pass401.java
+./tests/official_testcases/pa5_tests/pass401.mJAM
+./tests/official_testcases/pa5_tests/pass402.java
+./tests/official_testcases/pa5_tests/pass402.mJAM
+./tests/official_testcases/pa5_tests/pass403.java
+./tests/official_testcases/pa5_tests/pass403.mJAM
+./tests/official_testcases/pa5_tests/pass404.java
+./tests/official_testcases/pa5_tests/pass404.mJAM
+./tests/official_testcases/pa5_tests/pass405.java
+./tests/official_testcases/pa5_tests/pass405.mJAM
+./tests/official_testcases/pa5_tests/pass406.java
+./tests/official_testcases/pa5_tests/pass406.mJAM
+./tests/official_testcases/pa5_tests/pass407.java
+./tests/official_testcases/pa5_tests/pass407.mJAM
+./tests/official_testcases/pa5_tests/pass408.java
+./tests/official_testcases/pa5_tests/pass408.mJAM
+./tests/official_testcases/pa5_tests/pass409.java
+./tests/official_testcases/pa5_tests/pass409.mJAM
+./tests/official_testcases/pa5_tests/pass410.java
+./tests/official_testcases/pa5_tests/pass410.mJAM
+./tests/official_testcases/pa5_tests/pass411.java
+./tests/official_testcases/pa5_tests/pass411.mJAM
+./tests/official_testcases/pa5_tests/pass412.java
+./tests/official_testcases/pa5_tests/pass412.mJAM
+./tests/official_testcases/pa5_tests/pass413.java
+./tests/official_testcases/pa5_tests/pass413.mJAM
+./tests/official_testcases/pa5_tests/pass414.java
+./tests/official_testcases/pa5_tests/pass414.mJAM
+./tests/official_testcases/pa5_tests/pass415.java
+./tests/official_testcases/pa5_tests/pass415.mJAM
+./tests/official_testcases/pa5_tests/pass416.java
+./tests/official_testcases/pa5_tests/pass416.mJAM
+./tests/official_testcases/pa5_tests/pass417.java
+./tests/official_testcases/pa5_tests/pass417.mJAM
+./tests/official_testcases/pa5_tests/pass420.java
+./tests/official_testcases/pa5_tests/pass420.mJAM
+./tests/official_testcases/pa5_tests/pass421.java
+./tests/official_testcases/pa5_tests/pass421.mJAM
+./tests/official_testcases/pa5_tests/pass422.java
+./tests/official_testcases/pa5_tests/pass422.mJAM
+./tests/official_testcases/pa5_tests/pass423.java
+./tests/official_testcases/pa5_tests/pass423.mJAM
+./tests/official_testcases/pa5_tests/pass424.java
+./tests/official_testcases/pa5_tests/pass424.mJAM
+./tests/official_testcases/pa5_tests/pass425.java
+./tests/official_testcases/pa5_tests/pass425.mJAM
+./tests/official_testcases/pa5_tests/pass426.java
+./tests/official_testcases/pa5_tests/pass426.mJAM
+./tests/official_testcases/pa5_tests/pass501.java
+./tests/official_testcases/pa5_tests/pass501.mJAM
+./tests/official_testcases/pa5_tests/pass502.java
+./tests/official_testcases/pa5_tests/pass502.mJAM
+./tests/official_testcases/pa5_tests/pass503.java
+./tests/official_testcases/pa5_tests/pass503.mJAM
+./tests/official_testcases/pa5_tests/pass504.java
+./tests/official_testcases/pa5_tests/pass504.mJAM
+./tests/official_testcases/pa5_tests/pass505.java
+./tests/official_testcases/pa5_tests/pass505.mJAM
+./tests/official_testcases/pa5_tests/pass507.java
+./tests/official_testcases/pa5_tests/pass507.mJAM
+./tests/official_testcases/pa5_tests/pass508.java
+./tests/official_testcases/pa5_tests/pass508.mJAM
+./tests/official_testcases/pa5_tests/pass510.java
+./tests/official_testcases/pa5_tests/pass510.mJAM
+./tests/official_testcases/pa5_tests/pass520.java
+./tests/official_testcases/pa5_tests/pass520.mJAM
+./tests/official_testcases/pa5_tests/pass530.java
+./tests/official_testcases/pa5_tests/pass530.mJAM
+echo
+********** mJAM Interpreter (Version 2.3) **********
+Unable to load object file echo
+./tests/official_testcases/pa5_tests/pass320.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass326.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass348.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass350.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass360.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass364.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass381.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass383.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass394.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass399.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass401.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 1
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass402.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 2
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass403.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 3
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass404.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 4
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass405.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 5
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass406.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 6
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass407.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 7
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass408.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 8
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass409.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 9
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass410.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 10
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass411.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 11
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass412.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 12
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass413.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 13
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass414.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 14
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass415.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 15
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass416.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 16
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass417.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 17
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass420.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 20
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass421.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 21
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass422.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 22
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass423.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 23
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass424.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 24
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass425.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 25
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass426.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 26
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass501.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 1
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass502.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 2
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass503.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 3
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass504.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 4
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass505.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 5
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass507.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 7
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass508.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 8
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass510.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 10
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass520.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 20
+
+*** Program has halted normally.
+./tests/official_testcases/pa5_tests/pass530.mJAM
+********** mJAM Interpreter (Version 2.3) **********
+>>> 30
+
+*** Program has halted normally.
