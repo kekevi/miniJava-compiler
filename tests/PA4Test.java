@@ -89,10 +89,14 @@ class PA4Test
 
         if (1 == 1 || 1/0 == 1) {
             System.out.println(17);
+        } else {
+            System.out.println(-1);
         }
 
         /* 18: short circuiting && */
         if (1 != 1 && 1/0 == 1) {
+            System.out.println(18);
+        } else {
             System.out.println(18);
         }
 
